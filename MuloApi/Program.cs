@@ -7,9 +7,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MuloApi;
 using WebApplication1;
 
-namespace MuloPlayer
+namespace WebApplication1
 {
     public class Program
     {
