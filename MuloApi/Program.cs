@@ -32,7 +32,7 @@ namespace WebApplication1
                     logging.AddConsole();
                     logging.AddDebug();
                     logging.AddEventSourceLogger();
-                    logging.AddFile("log_mulo_api.txt");
+                    logging.AddFile("log/log_mulo_api.txt");
                 })
                 .UseStartup<Startup>()
                 .Build();
