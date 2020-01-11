@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MuloApi", "MuloApi\MuloApi.csproj", "{0138CC43-F505-43D8-961C-43E3D087239B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0138CC43-F505-43D8-961C-43E3D087239B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0138CC43-F505-43D8-961C-43E3D087239B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0138CC43-F505-43D8-961C-43E3D087239B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0138CC43-F505-43D8-961C-43E3D087239B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6260304B-46F5-4487-92B4-49383AC27004}
+	EndGlobalSection
+EndGlobal
