@@ -35,7 +35,7 @@ namespace MuloApi
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
