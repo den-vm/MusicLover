@@ -6,7 +6,7 @@ using MuloApi.Models;
 namespace MuloApi.Controllers
 {
     [ApiController]
-    public class AuthorizationController : ControllerBase
+    public class AuthentificationController : ControllerBase
     {
         [HttpPost]
         [Route("/authorization")]
