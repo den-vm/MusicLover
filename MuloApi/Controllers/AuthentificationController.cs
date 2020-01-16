@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MuloApi.Classes;
 using MuloApi.DataBase.Control;
 using MuloApi.Models;
@@ -10,10 +9,10 @@ namespace MuloApi.Controllers
     public class AuthentificationController : ControllerBase
     {
         private readonly CheckDataUser _checkDataUser = new CheckDataUser();
-
+        private readonly ControlDataBase _controlDb = ControlDataBase.Instance();
         [HttpPost]
         [Route("/authorization")]
-        public async Task<JsonResult> ConnectUser(ModelConnectingUser dataUser)
+        public JsonResult ConnectUser(ModelConnectingUser dataUser)
         {
             if (_checkDataUser.CheckLogin(dataUser.Login) && _checkDataUser.CheckPassword(dataUser.Password))
             {
@@ -37,7 +36,7 @@ namespace MuloApi.Controllers
 
         [HttpPost]
         [Route("/registration")]
-        public async Task<JsonResult> CreateUser(ModelConnectingUser dataUser)
+        public JsonResult CreateUser(ModelConnectingUser dataUser)
         {
             if (!_checkDataUser.CheckLogin(dataUser.Login))
             {
@@ -63,13 +62,34 @@ namespace MuloApi.Controllers
                 });
             }
 
-            ControlDataBase.Instance().AddUser(dataUser.Login, dataUser.Password);
+            var resultExist = _controlDb.ExistUser(dataUser.Login);
+            if (resultExist)
+            {
+                Response.StatusCode = 401;
+                return new JsonResult(new
+                {
+                    errors = new
+                    {
+                        message = "EXISTING_USER"
+                    }
+                });
+            }
 
-            Response.StatusCode = 200;
+            var resultAdd = _controlDb.AddUser(dataUser.Login, dataUser.Password);
+            if (resultAdd)
+            {
+                var idUser = _controlDb.GetUserId(dataUser.Login);
+                Response.StatusCode = 200;
+                return new JsonResult(new
+                {
+                    user_id = idUser,
+                    login = dataUser.Login
+                });
+            }
+            Response.StatusCode = 401;
             return new JsonResult(new
             {
-                user_id = 64315,
-                login = dataUser.Login
+                error = "ERRORSERVER"
             });
         }
     }
