@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MuloApi.Classes;
+using MuloApi.DataBase.Control;
 using MuloApi.Models;
 
 namespace MuloApi.Controllers
@@ -12,7 +13,7 @@ namespace MuloApi.Controllers
 
         [HttpPost]
         [Route("/authorization")]
-        public async Task<JsonResult> ConnectUser(ModelUser dataUser)
+        public async Task<JsonResult> ConnectUser(ModelConnectingUser dataUser)
         {
             if (_checkDataUser.CheckLogin(dataUser.Login) && _checkDataUser.CheckPassword(dataUser.Password))
             {
@@ -36,7 +37,7 @@ namespace MuloApi.Controllers
 
         [HttpPost]
         [Route("/registration")]
-        public async Task<JsonResult> CreateUser(ModelUser dataUser)
+        public async Task<JsonResult> CreateUser(ModelConnectingUser dataUser)
         {
             if (!_checkDataUser.CheckLogin(dataUser.Login))
             {
@@ -49,6 +50,7 @@ namespace MuloApi.Controllers
                     }
                 });
             }
+
             if (!_checkDataUser.CheckPassword(dataUser.Password))
             {
                 Response.StatusCode = 401;
@@ -60,6 +62,9 @@ namespace MuloApi.Controllers
                     }
                 });
             }
+
+            ControlDataBase.Instance().AddUser(dataUser.Login, dataUser.Password);
+
             Response.StatusCode = 200;
             return new JsonResult(new
             {
