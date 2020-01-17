@@ -3,8 +3,12 @@ using MuloApi.DataBase.Entities;
 
 namespace MuloApi.DataBase
 {
-    public class ConnectDataBase : DbContext
+    public class AppDBContent : DbContext
     {
+        public AppDBContent(DbContextOptions<AppDBContent> options) : base(options)
+        {
+
+        }
         public DbSet<DBUser> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

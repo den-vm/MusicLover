@@ -18,7 +18,7 @@ namespace MuloApi.DataBase.Control
         {
             try
             {
-                using var db = new ConnectDataBase();
+                using var db = new AppDBContent();
                 var user = new DBUser { Login = login, Password = password };
                 db.Users.Add(user);
                 db.SaveChanges();
@@ -35,7 +35,7 @@ namespace MuloApi.DataBase.Control
         {
             try
             {
-                using var db = new ConnectDataBase();
+                using var db = new AppDBContent();
                 var result = db.Users.FirstOrDefault(user => user.Login.Equals(login));
                 if (result != null) return true;
             }
@@ -49,7 +49,7 @@ namespace MuloApi.DataBase.Control
 
         public int GetUserId(string login)
         {
-            using var db = new ConnectDataBase();
+            using var db = new AppDBContent();
             var result = db.Users.Where(user => user.Login.Equals(login)).Select(data => data.Id).FirstOrDefault();
             return result;
         }
