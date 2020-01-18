@@ -1,2 +1,2 @@
 # MuloApi
-API music player
+API music player "Mulo"
