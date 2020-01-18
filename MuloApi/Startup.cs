@@ -12,11 +12,9 @@ namespace MuloApi
     public class Startup
     {
         public static ILogger<Program> LoggerApp;
-        private IConfigurationRoot _configuration;
         public Startup(IConfiguration configuration, IHostEnvironment host)
         {
             Configuration = configuration;
-            _configuration = new ConfigurationBuilder().SetBasePath(host.ContentRootPath).AddJsonFile("dbsettings.json").Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -24,7 +22,6 @@ namespace MuloApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<AppDBContent>(options => options.UseMySQL(_configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
         }
 
