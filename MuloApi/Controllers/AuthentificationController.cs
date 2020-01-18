@@ -10,6 +10,7 @@ namespace MuloApi.Controllers
     {
         private readonly CheckDataUser _checkDataUser = new CheckDataUser();
         private readonly ControlDataBase _controlDb = ControlDataBase.Instance();
+
         [HttpPost]
         [Route("/authorization")]
         public JsonResult ConnectUser(ModelConnectingUser dataUser)
@@ -86,6 +87,7 @@ namespace MuloApi.Controllers
                     login = dataUser.Login
                 });
             }
+
             Response.StatusCode = 401;
             return new JsonResult(new
             {
