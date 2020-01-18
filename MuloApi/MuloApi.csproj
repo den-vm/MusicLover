@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Company>Strangest IT-Developers</Company>
+    <Authors>Strangest IT-Developers</Authors>
+    <Description>Music player Mulo</Description>
   </PropertyGroup>
 
   <ItemGroup>
