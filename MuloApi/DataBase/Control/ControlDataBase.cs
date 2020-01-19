@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MuloApi.DataBase.Control.Interfaces;
@@ -19,16 +15,18 @@ namespace MuloApi.DataBase.Control
             try
             {
                 using var db = new AppDBContent();
-                var user = new DBUser { Login = login, Password = password };
+                var user = new DBUser {Login = login, Password = password};
                 db.Users.AddAsync(user);
                 db.SaveChangesAsync();
+                return true;
             }
             catch (Exception e)
             {
-                Startup.LoggerApp.LogWarning(e.ToString());
+                if (Startup.LoggerApp != null)
+                    Startup.LoggerApp.LogWarning(e.ToString());
             }
 
-            return true;
+            return false;
         }
 
         public bool ExistUser(string login)
@@ -41,7 +39,8 @@ namespace MuloApi.DataBase.Control
             }
             catch (Exception e)
             {
-                Startup.LoggerApp.LogWarning(e.ToString());
+                if (Startup.LoggerApp != null)
+                    Startup.LoggerApp.LogWarning(e.ToString());
             }
 
             return false;
