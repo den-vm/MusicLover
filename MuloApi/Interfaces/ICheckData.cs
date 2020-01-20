@@ -1,11 +1,12 @@
 ﻿namespace MuloApi.Interfaces
 {
     /// <summary>
-    /// Проверка входных данных пользователя
+    ///     Проверка входных данных пользователя
     /// </summary>
-    interface ICheckData
+    internal interface ICheckData
     {
-        bool CheckLogin(string login);
+        bool CheckLoginRegular(string login);
+        bool CheckLoginSmtp(string login);
         bool CheckPassword(string password);
     }
 }
