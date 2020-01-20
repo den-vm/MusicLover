@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Data;
-using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MuloApi.Controllers;
@@ -11,13 +9,42 @@ namespace XUnitTestMuloApi
 {
     public class UnitTestAuthentificationController
     {
-        private readonly ListResults _resultConnectUser = new ListResults();
+        private readonly ListResults _listResults = new ListResults();
 
         [Fact]
         public async void ConnectUserTest()
         {
             //Arrange
-            var autControl = new AuthentificationController
+            var setTestDataUser = new[]
+            {
+                new ModelConnectingUser
+                {
+                    Login = "layon165@yandex.ru",
+                    Password = "asdfqr"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex.ru",
+                    Password = "asdfqr"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex.ru",
+                    Password = "1234"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex,ru",
+                    Password = "asdfqr"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex,ru",
+                    Password = "1234"
+                }
+            };
+            var resultsConnectUser = new List<JsonResult>();
+            var authentificationController = new AuthentificationController
             {
                 ControllerContext = new ControllerContext
                 {
@@ -26,70 +53,24 @@ namespace XUnitTestMuloApi
             };
 
             //Act
-            var dataUserArray = new[]
+            foreach (var dataUser in setTestDataUser)
             {
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                }
-            };
-            var showsMethod = new List<string>();
-            foreach (var _dataUser in dataUserArray)
-            {
-                var result = await autControl.ConnectUser(_dataUser);
-                showsMethod.Add(result.Value.ToString());
+                var result = await authentificationController.ConnectUser(dataUser);
+                resultsConnectUser.Add(result);
             }
 
-
-
-            // Assert
-            foreach (var resMethod in showsMethod)
+            //Assert
+            foreach (var result in resultsConnectUser)
             {
-                Assert.NotNull(resMethod);
-                if (resMethod.Contains("user_id") && resMethod.Contains("login"))
+                Assert.NotNull(result);
+                if (result.Value.ToString().Contains("user_id") && result.Value.ToString().Contains("login"))
                 {
                     Assert.Matches(@"^\{\s[u,s,e,r]{4}_[a-zA-Z]{2}\s\=\s[0-9]+\,\s[l,o,g,i,n]{5}\s\=\s.*\s\}$",
-                        resMethod);
+                        result.Value.ToString());
                     continue;
                 }
 
-                Assert.Contains(resMethod, _resultConnectUser.MethodConnectUser());
+                result.AssertContains(_listResults.MethodConnectUser());
             }
         }
 
@@ -97,7 +78,31 @@ namespace XUnitTestMuloApi
         public async void CreateUserTest()
         {
             //Arrange
-            var autControl = new AuthentificationController
+            var setTestDataUser = new[]
+            {
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex.ru",
+                    Password = "asdfqr"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex.ru",
+                    Password = "1234"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex,ru",
+                    Password = "asdfqr"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex,ru",
+                    Password = "1234"
+                }
+            };
+            var resultsCreateUser = new List<JsonResult>();
+            var authentificationController = new AuthentificationController
             {
                 ControllerContext = new ControllerContext
                 {
@@ -106,510 +111,24 @@ namespace XUnitTestMuloApi
             };
 
             //Act
-            var dataUserArray = new[]
+            foreach (var dataUser in setTestDataUser)
             {
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex.ru",
-                    Password = "1234"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "asdfqr"
-                },
-                new ModelConnectingUser
-                {
-                    Login = "layon16@yandex,ru",
-                    Password = "1234"
-                }
-            };
-            var showsMethod = new List<string>();
-            
-            foreach (var _dataUser in dataUserArray)
-            {
-                var result = await autControl.CreateUser(_dataUser);
-                showsMethod.Add(result.Value.ToString());
+                var result = await authentificationController.CreateUser(dataUser);
+                resultsCreateUser.Add(result);
             }
 
-
             // Assert
-            foreach (var resMethod in showsMethod)
+            foreach (var result in resultsCreateUser)
             {
-                Assert.NotNull(resMethod);
-                if (resMethod.Contains("user_id") && resMethod.Contains("login"))
+                Assert.NotNull(result);
+                if (result.Value.ToString().Contains("user_id") && result.Value.ToString().Contains("login"))
                 {
                     Assert.Matches(@"^\{\s[u,s,e,r]{4}_[a-zA-Z]{2}\s\=\s[0-9]+\,\s[l,o,g,i,n]{5}\s\=\s.*\s\}$",
-                        resMethod);
+                        result.Value.ToString());
                     continue;
                 }
 
-                Assert.Contains(resMethod, _resultConnectUser.MethodCreateUser());
+                result.AssertContains(_listResults.MethodCreateUser());
             }
         }
     }

@@ -1,51 +1,61 @@
-﻿namespace XUnitTestMuloApi
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace XUnitTestMuloApi
 {
     internal class ListResults : IQueryResults
     {
-        public string[] MethodConnectUser()
+        public JsonResult[] MethodConnectUser()
         {
-            string[] listResults =
+            var listResults = new[]
             {
-                new
+                new JsonResult(new
+                {
+                    error = "ERRORSERVER"
+                }) {StatusCode = 521},
+                new JsonResult(new
                 {
                     errors = new
                     {
                         message = "INCORRECT_PASSWORD_OR_LOGIN"
                     }
-                }.ToString()
+                }) {StatusCode = 401}
             };
             return listResults;
         }
 
-        public string[] MethodCreateUser()
+        public JsonResult[] MethodCreateUser()
         {
-            string[] listResults =
+            var listResults = new[]
             {
-                new
+                new JsonResult(new
                 {
                     errors = new
                     {
                         message = "INCORRECT_LOGIN"
                     }
-                }.ToString(),
-                new
+                }) {StatusCode = 401},
+                new JsonResult(new
                 {
                     errors = new
                     {
                         message = "INCORRECT_PASSWORD"
                     }
-                }.ToString(),
-                new
+                }) {StatusCode = 401},
+                new JsonResult(new
                 {
                     errors = new
                     {
                         message = "EXISTING_USER"
                     }
-                }.ToString(),
-                new
+                }) {StatusCode = 401},
+                new JsonResult(new
                 {
                     error = "ERRORSERVER"
-                }.ToString()
+                }) {StatusCode = 521},
+                new JsonResult(new
+                {
+                    error = "ERRORSERVER"
+                }) {StatusCode = 500}
             };
             return listResults;
         }

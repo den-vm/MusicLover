@@ -7,7 +7,7 @@ namespace XUnitTestMuloApi
 {
     interface IQueryResults
     {
-        string[] MethodConnectUser();
-        string[] MethodCreateUser();
+        JsonResult[] MethodConnectUser();
+        JsonResult[] MethodCreateUser();
     }
 }
