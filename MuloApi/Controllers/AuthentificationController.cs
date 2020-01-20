@@ -17,37 +17,40 @@ namespace MuloApi.Controllers
         [Route("/authorization")]
         public async Task<JsonResult> ConnectUser(ModelConnectingUser dataUser)
         {
-            if (_checkDataUser.CheckLoginRegular(dataUser.Login) && _checkDataUser.CheckPassword(dataUser.Password))
-                if (await AppDBContent.TestConnection())
+            if (!_checkDataUser.CheckLoginRegular(dataUser.Login) || !_checkDataUser.CheckPassword(dataUser.Password))
+                return new JsonResult(new
                 {
-                    var idUser = _controlDb.GetUserId(dataUser.Login);
-                    if (idUser != -1)
+                    errors = new
                     {
-                        Response.StatusCode = 200;
-                        return new JsonResult(new
-                        {
-                            user_id = idUser,
-                            login = dataUser.Login
-                        });
+                        message = "INCORRECT_PASSWORD_OR_LOGIN"
                     }
-                }
-                else
-                {
-                    Response.StatusCode = 521;
-                    return new JsonResult(new
-                    {
-                        error = "ERRORSERVER"
-                    });
-                }
+                })
+                { StatusCode = 401 };
 
-            Response.StatusCode = 401;
+            if (!await AppDBContent.TestConnection())
+                return new JsonResult(new
+                {
+                    error = "ERRORSERVER"
+                })
+                { StatusCode = 521 };
+
+            var idUser = _controlDb.GetUserId(dataUser.Login);
+            if (idUser != -1)
+                return new JsonResult(new
+                {
+                    user_id = idUser,
+                    login = dataUser.Login
+                })
+                { StatusCode = 200 };
+
             return new JsonResult(new
             {
                 errors = new
                 {
                     message = "INCORRECT_PASSWORD_OR_LOGIN"
                 }
-            });
+            })
+            { StatusCode = 401 };
         }
 
         [HttpPost]
@@ -55,71 +58,65 @@ namespace MuloApi.Controllers
         public async Task<JsonResult> CreateUser(ModelConnectingUser dataUser)
         {
             if (!_checkDataUser.CheckLoginRegular(dataUser.Login))
-            {
-                Response.StatusCode = 401;
                 return new JsonResult(new
                 {
                     errors = new
                     {
                         message = "INCORRECT_LOGIN"
                     }
-                });
-            }
+                })
+                { StatusCode = 401 };
 
             if (!_checkDataUser.CheckPassword(dataUser.Password))
-            {
-                Response.StatusCode = 401;
                 return new JsonResult(new
                 {
                     errors = new
                     {
                         message = "INCORRECT_PASSWORD"
                     }
-                });
-            }
+                })
+                { StatusCode = 401 };
 
-            if (await AppDBContent.TestConnection())
-            {
-                var resultExist = _controlDb.ExistUser(dataUser.Login);
-                if (resultExist)
+            if (!await AppDBContent.TestConnection())
+                return new JsonResult(new
                 {
-                    Response.StatusCode = 401;
-                    return new JsonResult(new
-                    {
-                        errors = new
-                        {
-                            message = "EXISTING_USER"
-                        }
-                    });
-                }
+                    error = "ERRORSERVER"
+                })
+                { StatusCode = 521 };
 
-                var resultAdd = _controlDb.AddUser(dataUser.Login, dataUser.Password);
-                if (resultAdd)
+            var resultExist = _controlDb.ExistUser(dataUser.Login);
+            if (resultExist)
+                return new JsonResult(new
                 {
-                    var result = _controlDb.GetUserId(dataUser.Login);
-                    if (result != -1)
+                    errors = new
                     {
-                        Response.StatusCode = 200;
-                        return new JsonResult(new
-                        {
-                            user_id = result,
-                            login = dataUser.Login
-                        });
+                        message = "EXISTING_USER"
                     }
+                })
+                { StatusCode = 401 };
 
-                    Response.StatusCode = 500;
-                    return new JsonResult(new
-                    {
-                        error = "ERRORSERVER"
-                    });
-                }
-            }
+            var resultAdd = _controlDb.AddUser(dataUser.Login, dataUser.Password);
+            if (!resultAdd)
+                return new JsonResult(new
+                {
+                    error = "ERRORSERVER"
+                })
+                { StatusCode = 521 };
 
-            Response.StatusCode = 521;
+            var idUser = _controlDb.GetUserId(dataUser.Login);
+            if (idUser != -1)
+                return new JsonResult(new
+                {
+                    user_id = idUser,
+                    login = dataUser.Login
+                })
+                { StatusCode = 200 };
+
             return new JsonResult(new
             {
                 error = "ERRORSERVER"
-            });
+            })
+            { StatusCode = 500 };
         }
     }
 }
