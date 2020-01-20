@@ -17,15 +17,28 @@ namespace MuloApi.Controllers
         [Route("/authorization")]
         public async Task<JsonResult> ConnectUser(ModelConnectingUser dataUser)
         {
-            if (_checkDataUser.CheckLogin(dataUser.Login) && _checkDataUser.CheckPassword(dataUser.Password))
-            {
-                Response.StatusCode = 200;
-                return new JsonResult(new
+            if (_checkDataUser.CheckLoginRegular(dataUser.Login) && _checkDataUser.CheckPassword(dataUser.Password))
+                if (await AppDBContent.TestConnection())
                 {
-                    user_id = 64315,
-                    login = dataUser.Login
-                });
-            }
+                    var idUser = _controlDb.GetUserId(dataUser.Login);
+                    if (idUser != -1)
+                    {
+                        Response.StatusCode = 200;
+                        return new JsonResult(new
+                        {
+                            user_id = idUser,
+                            login = dataUser.Login
+                        });
+                    }
+                }
+                else
+                {
+                    Response.StatusCode = 521;
+                    return new JsonResult(new
+                    {
+                        error = "ERRORSERVER"
+                    });
+                }
 
             Response.StatusCode = 401;
             return new JsonResult(new
@@ -41,7 +54,7 @@ namespace MuloApi.Controllers
         [Route("/registration")]
         public async Task<JsonResult> CreateUser(ModelConnectingUser dataUser)
         {
-            if (!_checkDataUser.CheckLogin(dataUser.Login))
+            if (!_checkDataUser.CheckLoginRegular(dataUser.Login))
             {
                 Response.StatusCode = 401;
                 return new JsonResult(new
@@ -84,12 +97,20 @@ namespace MuloApi.Controllers
                 if (resultAdd)
                 {
                     var result = _controlDb.GetUserId(dataUser.Login);
+                    if (result != -1)
+                    {
+                        Response.StatusCode = 200;
+                        return new JsonResult(new
+                        {
+                            user_id = result,
+                            login = dataUser.Login
+                        });
+                    }
 
-                    Response.StatusCode = 200;
+                    Response.StatusCode = 500;
                     return new JsonResult(new
                     {
-                        user_id = result,
-                        login = dataUser.Login
+                        error = "ERRORSERVER"
                     });
                 }
             }

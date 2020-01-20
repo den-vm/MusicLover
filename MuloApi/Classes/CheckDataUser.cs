@@ -5,10 +5,15 @@ namespace MuloApi.Classes
 {
     public class CheckDataUser : ICheckData
     {
-        public bool CheckLogin(string login)
+        public bool CheckLoginRegular(string login)
         {
             var RegEmail = @"^((\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*)\s*[;]{0,1}\s*)+$";
             return Regex.IsMatch(login, RegEmail, RegexOptions.IgnoreCase);
+        }
+
+        public bool CheckLoginSmtp(string login)
+        {
+            throw new System.NotImplementedException();
         }
 
         public bool CheckPassword(string pass)
