@@ -49,8 +49,10 @@ namespace MuloApi.DataBase.Control
         public int GetUserId(string login)
         {
             using var db = new AppDBContent();
-            var result = db.Users.FirstOrDefaultAsync(user => user.Login.Equals(login)).Result.Id;
-            return result;
+            var result = db.Users.FirstOrDefaultAsync(user => user.Login.Equals(login)).Result;
+            if (result != null)
+                return result.Id;
+            return -1;
         }
 
         public static ControlDataBase Instance()
