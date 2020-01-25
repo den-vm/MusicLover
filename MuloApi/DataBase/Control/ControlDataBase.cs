@@ -8,8 +8,6 @@ namespace MuloApi.DataBase.Control
 {
     public class ControlDataBase : IActionUser
     {
-        private static ControlDataBase _control;
-
         public bool AddUser(string login, string password)
         {
             try
@@ -60,12 +58,8 @@ namespace MuloApi.DataBase.Control
                 if (Startup.LoggerApp != null)
                     Startup.LoggerApp.LogWarning(e.ToString());
             }
-            return -1;
-        }
 
-        public static ControlDataBase Instance()
-        {
-            return _control ??= new ControlDataBase();
+            return -1;
         }
     }
 }
