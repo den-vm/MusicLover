@@ -132,5 +132,12 @@ namespace MuloApi.Controllers
                 })
                 {StatusCode = 500};
         }
+
+        [HttpGet]
+        [Route("/user/{idUser:min(0)}/soundtracks")]
+        public async Task<JsonResult> GetPlaylistUser(int idUser)
+        {
+            return new JsonResult(null);
+        }
     }
 }
