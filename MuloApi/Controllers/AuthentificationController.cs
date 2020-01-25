@@ -135,9 +135,9 @@ namespace MuloApi.Controllers
 
         [HttpGet]
         [Route("/user/{idUser:min(0)}/soundtracks")]
-        public async Task<JsonResult> GetPlaylistUser(int idUser)
+        public async Task<JsonResult> GetSoundTracksUser(int idUser)
         {
-            return new JsonResult(null);
+            return new JsonResult(new { testRequest = "Успешно" });
         }
     }
 }
