@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MuloApi.Classes;
 using MuloApi.DataBase;
 using MuloApi.DataBase.Control;
+using MuloApi.DataBase.Entities;
 using MuloApi.Models;
 
 namespace MuloApi.Controllers
@@ -27,7 +28,7 @@ namespace MuloApi.Controllers
                 })
                 { StatusCode = 401 };
 
-            if (!await AppDBContent.TestConnection())
+            if (!await AppDBContent<NewUser>.TestConnection())
                 return new JsonResult(new
                 {
                     error = "ERRORSERVER"
@@ -77,7 +78,7 @@ namespace MuloApi.Controllers
                 })
                 { StatusCode = 401 };
 
-            if (!await AppDBContent.TestConnection())
+            if (!await AppDBContent<ExistUser>.TestConnection())
                 return new JsonResult(new
                 {
                     error = "ERRORSERVER"
