@@ -8,9 +8,9 @@ using Newtonsoft.Json.Linq;
 
 namespace MuloApi.DataBase
 {
-    public class AppDBContent : DbContext
+    public class AppDBContent<T> : DbContext where T : class
     {
-        public DbSet<DBUser> Users { get; set; }
+        public DbSet<T> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -21,7 +21,7 @@ namespace MuloApi.DataBase
 
         public static async Task<bool> TestConnection()
         {
-            using var db = new AppDBContent();
+            using var db = new AppDBContent<T>();
             try
             {
                 await db.Database.OpenConnectionAsync();

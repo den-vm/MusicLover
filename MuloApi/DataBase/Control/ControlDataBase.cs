@@ -14,8 +14,8 @@ namespace MuloApi.DataBase.Control
         {
             try
             {
-                using var db = new AppDBContent();
-                var user = new DBUser {Login = login, Password = password};
+                using var db = new AppDBContent<NewUser>();
+                var user = new NewUser {Login = login, Password = password};
                 db.Users.AddAsync(user);
                 db.SaveChangesAsync();
                 return true;
@@ -33,7 +33,7 @@ namespace MuloApi.DataBase.Control
         {
             try
             {
-                using var db = new AppDBContent();
+                using var db = new AppDBContent<ExistUser>();
                 var result = db.Users.FirstOrDefaultAsync(user => user.Login.Equals(login)).Result;
                 if (result != null) return true;
             }
@@ -48,10 +48,18 @@ namespace MuloApi.DataBase.Control
 
         public int GetUserId(string login)
         {
-            using var db = new AppDBContent();
-            var result = db.Users.FirstOrDefaultAsync(user => user.Login.Equals(login)).Result;
-            if (result != null)
-                return result.Id;
+            try
+            {
+                using var db = new AppDBContent<ExistUser>();
+                var result = db.Users.FirstOrDefaultAsync(user => user.Login.Equals(login)).Result;
+                if (result != null)
+                    return result.Id;
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    Startup.LoggerApp.LogWarning(e.ToString());
+            }
             return -1;
         }
 
