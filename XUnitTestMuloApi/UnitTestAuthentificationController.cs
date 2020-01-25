@@ -19,7 +19,7 @@ namespace XUnitTestMuloApi
             {
                 new ModelConnectingUser
                 {
-                    Login = "layon165@yandex.ru",
+                    Login = "layon18@yandex.ru",
                     Password = "asdfqr"
                 },
                 new ModelConnectingUser
@@ -65,7 +65,7 @@ namespace XUnitTestMuloApi
                 Assert.NotNull(result);
                 if (result.Value.ToString().Contains("user_id") && result.Value.ToString().Contains("login"))
                 {
-                    Assert.Matches(@"^\{\s[u,s,e,r]{4}_[a-zA-Z]{2}\s\=\s[0-9]+\,\s[l,o,g,i,n]{5}\s\=\s.*\s\}$",
+                    Assert.Matches(@"^\{\s(user_id = )[0-9]+\,\s(login = ).*\s\}$",
                         result.Value.ToString());
                     continue;
                 }
@@ -83,6 +83,16 @@ namespace XUnitTestMuloApi
                 new ModelConnectingUser
                 {
                     Login = "layon16@yandex.ru",
+                    Password = "asdfqr"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon55@yandex.ru",
+                    Password = "asdfqr"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon18@yandex.ru",
                     Password = "asdfqr"
                 },
                 new ModelConnectingUser
@@ -123,7 +133,7 @@ namespace XUnitTestMuloApi
                 Assert.NotNull(result);
                 if (result.Value.ToString().Contains("user_id") && result.Value.ToString().Contains("login"))
                 {
-                    Assert.Matches(@"^\{\s[u,s,e,r]{4}_[a-zA-Z]{2}\s\=\s[0-9]+\,\s[l,o,g,i,n]{5}\s\=\s.*\s\}$",
+                    Assert.Matches(@"^\{\s(user_id = )[0-9]+\,\s(login = ).*\s\}$",
                         result.Value.ToString());
                     continue;
                 }
