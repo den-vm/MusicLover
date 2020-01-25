@@ -1,6 +1,5 @@
 {
   "ConnectionStrings": {
-    //"DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=_CHANGE_ME;Trusted_Connection=True;MultipleActiveResultSets=true"
     "DefaultConnection": "server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd"
   }
 }
