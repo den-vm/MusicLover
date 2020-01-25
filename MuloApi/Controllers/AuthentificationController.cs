@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using MuloApi.Classes;
 using MuloApi.DataBase;
 using MuloApi.DataBase.Control;
+using MuloApi.DataBase.Control.Interfaces;
 using MuloApi.DataBase.Entities;
+using MuloApi.Interfaces;
 using MuloApi.Models;
 
 namespace MuloApi.Controllers
@@ -11,9 +13,8 @@ namespace MuloApi.Controllers
     [ApiController]
     public class AuthentificationController : ControllerBase
     {
-        private readonly CheckDataUser _checkDataUser = new CheckDataUser();
-
-        private readonly ControlDataBase _controlDb = ControlDataBase.Instance();
+        private readonly ICheckData _checkDataUser = new CheckDataUser();
+        private readonly IActionUser _controlDBUser = new ControlDataBase();
 
         [HttpPost]
         [Route("/authorization")]
@@ -39,7 +40,7 @@ namespace MuloApi.Controllers
                         })
                         {StatusCode = 521};
 
-                var idUser = _controlDb.GetUserId(dataUser.Login);
+                var idUser = _controlDBUser.GetUserId(dataUser.Login);
                 if (idUser != -1)
                     return new JsonResult(new
                         {
@@ -92,7 +93,7 @@ namespace MuloApi.Controllers
                         })
                         {StatusCode = 521};
 
-                var resultExist = _controlDb.ExistUser(dataUser.Login);
+                var resultExist = _controlDBUser.ExistUser(dataUser.Login);
                 if (resultExist)
                     return new JsonResult(new
                         {
@@ -103,7 +104,7 @@ namespace MuloApi.Controllers
                         })
                         {StatusCode = 401};
 
-                var resultAdd = _controlDb.AddUser(dataUser.Login, dataUser.Password);
+                var resultAdd = _controlDBUser.AddUser(dataUser.Login, dataUser.Password);
                 if (!resultAdd)
                     return new JsonResult(new
                         {
@@ -111,14 +112,18 @@ namespace MuloApi.Controllers
                         })
                         {StatusCode = 521};
 
-                var idUser = _controlDb.GetUserId(dataUser.Login);
+                var idUser = _controlDBUser.GetUserId(dataUser.Login);
                 if (idUser != -1)
+                {
+                    IActionDirectory addDirectoryUser = new UserDirectory();
+                    addDirectoryUser.CreateDirectoryUser(idUser);
                     return new JsonResult(new
                         {
                             user_id = idUser,
                             login = dataUser.Login
                         })
                         {StatusCode = 200};
+                }
             }
 
             return new JsonResult(new
