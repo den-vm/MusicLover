@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MuloApi", "MuloApi\MuloApi.csproj", "{0138CC43-F505-43D8-961C-43E3D087239B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitTestMuloApi", "XUnitTestMuloApi\XUnitTestMuloApi.csproj", "{A92AA26D-7E97-4B43-B861-AEB2D2D85D8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestMuloApi", "XUnitTestMuloApi\XUnitTestMuloApi.csproj", "{A92AA26D-7E97-4B43-B861-AEB2D2D85D8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MuloApi.DataBase.Entities;
 using Newtonsoft.Json.Linq;
 
@@ -13,7 +14,7 @@ namespace MuloApi.DataBase
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var settingsFile = File.ReadAllTextAsync(Directory.GetCurrentDirectory() + @"\dbsettings.json").Result;
+            var settingsFile = File.ReadAllTextAsync(Directory.GetCurrentDirectory() + @"/dbsettings.json").Result;
             var connectString = (string) JObject.Parse(settingsFile)["ConnectionStrings"]["DefaultConnection"];
             optionsBuilder.UseMySQL(connectString);
         }
