@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MuloApi.Controllers;
@@ -22,10 +23,15 @@ namespace XUnitTestMuloApi
                     Login = "layon18@yandex.ru",
                     Password = "asdfqr"
                 },
+                new ModelConnectingUser(),
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex.ru"
+                },
                 new ModelConnectingUser
                 {
                     Login = "layon16@yandex.ru",
-                    Password = "asdfqr"
+                    Password = ""
                 },
                 new ModelConnectingUser
                 {
@@ -59,6 +65,18 @@ namespace XUnitTestMuloApi
                 resultsConnectUser.Add(result);
             }
 
+            var settingDB = new StreamWriter(Directory.GetCurrentDirectory() + @"/dbsettings.json");
+            var setConnect =
+                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplaye;user=mulobd;password=051291+Mulobd\" } }";
+            await settingDB.WriteLineAsync(setConnect);
+            settingDB.Close();
+
+            foreach (var dataUser in setTestDataUser)
+            {
+                var result = await authentificationController.ConnectUser(dataUser);
+                resultsConnectUser.Add(result);
+            }
+
             //Assert
             foreach (var result in resultsConnectUser)
             {
@@ -72,6 +90,12 @@ namespace XUnitTestMuloApi
 
                 result.AssertContains(_listResults.MethodConnectUser());
             }
+
+            settingDB = new StreamWriter(Directory.GetCurrentDirectory() + @"/dbsettings.json");
+            var setConnectOK =
+                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd\" } }";
+            await settingDB.WriteLineAsync(setConnectOK);
+            settingDB.Close();
         }
 
         [Fact]
@@ -84,6 +108,16 @@ namespace XUnitTestMuloApi
                 {
                     Login = "layon16@yandex.ru",
                     Password = "asdfqr"
+                },
+                new ModelConnectingUser(),
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex.ru"
+                },
+                new ModelConnectingUser
+                {
+                    Login = "layon16@yandex.ru",
+                    Password = ""
                 },
                 new ModelConnectingUser
                 {
@@ -127,6 +161,18 @@ namespace XUnitTestMuloApi
                 resultsCreateUser.Add(result);
             }
 
+            var settingDB = new StreamWriter(Directory.GetCurrentDirectory() + @"/dbsettings.json");
+            var setConnect =
+                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplaye;user=mulobd;password=051291+Mulobd\" } }";
+            await settingDB.WriteLineAsync(setConnect);
+            settingDB.Close();
+
+            foreach (var dataUser in setTestDataUser)
+            {
+                var result = await authentificationController.CreateUser(dataUser);
+                resultsCreateUser.Add(result);
+            }
+
             // Assert
             foreach (var result in resultsCreateUser)
             {
@@ -140,6 +186,12 @@ namespace XUnitTestMuloApi
 
                 result.AssertContains(_listResults.MethodCreateUser());
             }
+
+            settingDB = new StreamWriter(Directory.GetCurrentDirectory() + @"/dbsettings.json");
+            var setConnectOK =
+                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd\" } }";
+            await settingDB.WriteLineAsync(setConnectOK);
+            settingDB.Close();
         }
     }
 }
