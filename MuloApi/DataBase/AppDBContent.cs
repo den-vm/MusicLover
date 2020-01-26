@@ -14,7 +14,7 @@ namespace MuloApi.DataBase
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var settingsFile = File.ReadAllTextAsync(Directory.GetCurrentDirectory() + @"/dbsettings.json").Result;
+            var settingsFile = File.ReadAllTextAsync(@"/dbsettings.json").Result;
             var connectString = (string) JObject.Parse(settingsFile)["ConnectionStrings"]["DefaultConnection"];
             optionsBuilder.UseMySQL(connectString);
         }

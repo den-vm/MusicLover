@@ -65,7 +65,7 @@ namespace XUnitTestMuloApi
                 resultsConnectUser.Add(result);
             }
 
-            var settingDB = new StreamWriter(Directory.GetCurrentDirectory() + @"/dbsettings.json");
+            var settingDB = new StreamWriter(@"/dbsettings.json");
             var setConnect =
                 "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplaye;user=mulobd;password=051291+Mulobd\" } }";
             await settingDB.WriteLineAsync(setConnect);
@@ -91,7 +91,7 @@ namespace XUnitTestMuloApi
                 result.AssertContains(_listResults.MethodConnectUser());
             }
 
-            settingDB = new StreamWriter(Directory.GetCurrentDirectory() + @"/dbsettings.json");
+            settingDB = new StreamWriter(@"/dbsettings.json");
             var setConnectOK =
                 "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd\" } }";
             await settingDB.WriteLineAsync(setConnectOK);
@@ -161,7 +161,7 @@ namespace XUnitTestMuloApi
                 resultsCreateUser.Add(result);
             }
 
-            var settingDB = new StreamWriter(Directory.GetCurrentDirectory() + @"/dbsettings.json");
+            var settingDB = new StreamWriter(@"/dbsettings.json");
             var setConnect =
                 "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplaye;user=mulobd;password=051291+Mulobd\" } }";
             await settingDB.WriteLineAsync(setConnect);
@@ -187,7 +187,7 @@ namespace XUnitTestMuloApi
                 result.AssertContains(_listResults.MethodCreateUser());
             }
 
-            settingDB = new StreamWriter(Directory.GetCurrentDirectory() + @"/dbsettings.json");
+            settingDB = new StreamWriter(@"/dbsettings.json");
             var setConnectOK =
                 "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd\" } }";
             await settingDB.WriteLineAsync(setConnectOK);

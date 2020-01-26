@@ -10,7 +10,7 @@ namespace MuloApi.Classes
 {
     public class UserDirectory : IActionDirectory
     {
-        private readonly string _defaultDirectoryUser = Directory.GetCurrentDirectory() + @"/ExistingUsers/";
+        private readonly string _defaultDirectoryUser = @"../ExistingUsers/";
 
         public void CreateDirectoryUser(int idUser)
         {
