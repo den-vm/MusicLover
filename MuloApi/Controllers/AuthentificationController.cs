@@ -135,9 +135,26 @@ namespace MuloApi.Controllers
 
         [HttpGet]
         [Route("/user/{idUser:min(0)}/soundtracks")]
-        public async Task<JsonResult> GetSoundTracksUser(int idUser)
+        public JsonResult GetSoundTracksUser(int idUser)
         {
-            return new JsonResult(new { testRequest = "Успешно" });
+            IActionDirectory userDirectory = new UserDirectory();
+            var listTracks = userDirectory.GetRootTracksUser(idUser);
+            if (listTracks == null)
+                return new JsonResult(new
+                    {
+                        error = "ERRORSERVER"
+                    })
+                    {StatusCode = 500};
+            if (listTracks.Length == 0)
+                return new JsonResult(new
+                    {
+                        tracks = "empty"
+                    })
+                    {StatusCode = 200};
+            return new JsonResult(new
+            {
+                tracks = listTracks
+            });
         }
     }
 }
