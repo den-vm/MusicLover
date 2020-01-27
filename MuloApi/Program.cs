@@ -29,7 +29,7 @@ namespace MuloApi
                 })
                 .UseStartup<Startup>()
                 .Build();
-
+            
             host.Run();
         }
     }

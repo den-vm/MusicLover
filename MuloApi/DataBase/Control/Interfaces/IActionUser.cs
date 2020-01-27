@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace MuloApi.DataBase.Control.Interfaces
 {
-    interface IActionUser
+    internal interface IActionUser
     {
-        bool AddUser(string login, string password);
-        bool ExistUser(string login);
-        int GetUserId(string login);
+        Task<bool> AddUser(string login, string password);
+        Task<bool> ExistUser(string login);
+        Task<int> GetUserId(string login);
     }
 }

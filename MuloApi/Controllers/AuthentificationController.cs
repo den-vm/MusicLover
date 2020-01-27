@@ -40,7 +40,7 @@ namespace MuloApi.Controllers
                         })
                         {StatusCode = 521};
 
-                var idUser = _controlDBUser.GetUserId(dataUser.Login);
+                var idUser = await _controlDBUser.GetUserId(dataUser.Login);
                 if (idUser != -1)
                     return new JsonResult(new
                         {
@@ -93,7 +93,7 @@ namespace MuloApi.Controllers
                         })
                         {StatusCode = 521};
 
-                var resultExist = _controlDBUser.ExistUser(dataUser.Login);
+                var resultExist = await _controlDBUser.ExistUser(dataUser.Login);
                 if (resultExist)
                     return new JsonResult(new
                         {
@@ -104,7 +104,7 @@ namespace MuloApi.Controllers
                         })
                         {StatusCode = 401};
 
-                var resultAdd = _controlDBUser.AddUser(dataUser.Login, dataUser.Password);
+                var resultAdd = await _controlDBUser.AddUser(dataUser.Login, dataUser.Password);
                 if (!resultAdd)
                     return new JsonResult(new
                         {
@@ -112,7 +112,7 @@ namespace MuloApi.Controllers
                         })
                         {StatusCode = 521};
 
-                var idUser = _controlDBUser.GetUserId(dataUser.Login);
+                var idUser = await _controlDBUser.GetUserId(dataUser.Login);
                 if (idUser != -1)
                 {
                     IActionDirectory addDirectoryUser = new UserDirectory();
@@ -135,10 +135,10 @@ namespace MuloApi.Controllers
 
         [HttpGet]
         [Route("/user/{idUser:min(0)}/soundtracks")]
-        public JsonResult GetSoundTracksUser(int idUser)
+        public async Task<JsonResult> GetSoundTracksUser(int idUser)
         {
             IActionDirectory userDirectory = new UserDirectory();
-            var listTracks = userDirectory.GetRootTracksUser(idUser);
+            var listTracks = await userDirectory.GetRootTracksUser(idUser);
             if (listTracks == null)
                 return new JsonResult(new
                     {

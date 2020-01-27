@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MuloApi.Interfaces;
 using MuloApi.Models;
@@ -12,19 +13,28 @@ namespace MuloApi.Classes
     {
         private readonly string _defaultDirectoryUser = @"../ExistingUsers/";
 
-        public void CreateDirectoryUser(int idUser)
+        public async void CreateDirectoryUser(int idUser)
         {
-            var dirInfo = new DirectoryInfo(_defaultDirectoryUser);
-            if (!dirInfo.Exists) dirInfo.Create();
-            dirInfo.CreateSubdirectory($"user_{idUser}");
+            try
+            {
+                var dirInfo = new DirectoryInfo(_defaultDirectoryUser);
+                if (!dirInfo.Exists) dirInfo.Create();
+                dirInfo.CreateSubdirectory($"user_{idUser}");
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+            }
         }
 
-        public ModelUserTracks[] GetRootTracksUser(int idUser)
+        public async Task<ModelUserTracks[]> GetRootTracksUser(int idUser)
         {
             try
             {
                 string[] filters = {"*.mp3"};
-                var mp3List = ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", filters);
+                var mp3List = await Task.Run(() =>
+                    ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", filters));
                 var tracksUser = (from track in mp3List
                     select MusicFile.Create(track)
                     into tagsTrack
@@ -41,16 +51,24 @@ namespace MuloApi.Classes
             catch (Exception e)
             {
                 if (Startup.LoggerApp != null)
-                    Startup.LoggerApp.LogWarning(e.ToString());
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
             }
 
             return null;
         }
 
-        public void DeleteDirectoryUser(int idUser)
+        public async void DeleteDirectoryUser(int idUser)
         {
-            var dirUser = new DirectoryInfo(_defaultDirectoryUser) + $"user_{idUser}";
-            Directory.Delete(dirUser);
+            try
+            {
+                var dirUser = new DirectoryInfo(_defaultDirectoryUser) + $"user_{idUser}";
+                Directory.Delete(dirUser);
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+            }
         }
     }
 }
