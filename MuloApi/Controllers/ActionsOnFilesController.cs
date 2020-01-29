@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using MuloApi.Classes;
 using MuloApi.Interfaces;
-using MuloApi.Models;
-using TagLib.Mpeg;
 
 namespace MuloApi.Controllers
 {
@@ -29,7 +20,7 @@ namespace MuloApi.Controllers
                     {
                         error = "ERRORSERVER"
                     })
-                    { StatusCode = 500 };
+                    {StatusCode = 500};
             return new JsonResult(new
             {
                 tracks = downloadedTrack
@@ -47,8 +38,8 @@ namespace MuloApi.Controllers
                     {
                         error = "ERRORSERVER"
                     })
-                    { StatusCode = 500 };
-            
+                    {StatusCode = 500};
+
             return trackBinary;
         }
     }
