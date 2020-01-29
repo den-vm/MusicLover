@@ -9,5 +9,6 @@ namespace XUnitTestMuloApi
     {
         JsonResult[] MethodConnectUser();
         JsonResult[] MethodCreateUser();
+        JsonResult[] MethodGetSoundTracksUser();
     }
 }

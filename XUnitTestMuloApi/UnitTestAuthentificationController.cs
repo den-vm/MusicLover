@@ -77,6 +77,12 @@ namespace XUnitTestMuloApi
                 resultsConnectUser.Add(result);
             }
 
+            settingDB = new StreamWriter(@"dbsettings.json");
+            var setConnectOK =
+                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd\" } }";
+            await settingDB.WriteLineAsync(setConnectOK);
+            settingDB.Close();
+
             //Assert
             foreach (var result in resultsConnectUser)
             {
@@ -90,12 +96,6 @@ namespace XUnitTestMuloApi
 
                 result.AssertContains(_listResults.MethodConnectUser());
             }
-
-            settingDB = new StreamWriter(@"dbsettings.json");
-            var setConnectOK =
-                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd\" } }";
-            await settingDB.WriteLineAsync(setConnectOK);
-            settingDB.Close();
         }
 
         [Fact]
@@ -173,6 +173,12 @@ namespace XUnitTestMuloApi
                 resultsCreateUser.Add(result);
             }
 
+            settingDB = new StreamWriter(@"dbsettings.json");
+            var setConnectOK =
+                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd\" } }";
+            await settingDB.WriteLineAsync(setConnectOK);
+            settingDB.Close();
+
             // Assert
             foreach (var result in resultsCreateUser)
             {
@@ -186,12 +192,59 @@ namespace XUnitTestMuloApi
 
                 result.AssertContains(_listResults.MethodCreateUser());
             }
+        }
+
+        [Fact]
+        public async void GetSoundTracksUserTest()
+        {
+            //Arrange
+            var resultsCreateUser = new List<JsonResult>();
+            var authentificationController = new AuthentificationController
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext()
+                }
+            };
+
+            //Act
+            for (var i = 0; i < 10; i++)
+            {
+                var result = await authentificationController.GetSoundTracksUser(i);
+                resultsCreateUser.Add(result);
+            }
+
+            var settingDB = new StreamWriter(@"dbsettings.json");
+            var setConnect =
+                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplaye;user=mulobd;password=051291+Mulobd\" } }";
+            await settingDB.WriteLineAsync(setConnect);
+            settingDB.Close();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var result = await authentificationController.GetSoundTracksUser(i);
+                resultsCreateUser.Add(result);
+            }
 
             settingDB = new StreamWriter(@"dbsettings.json");
             var setConnectOK =
                 "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd\" } }";
             await settingDB.WriteLineAsync(setConnectOK);
             settingDB.Close();
+
+            // Assert
+            foreach (var result in resultsCreateUser)
+            {
+                Assert.NotNull(result);
+                if (result.Value.ToString().Contains("MuloApi.Models.ModelUserTracks"))
+                {
+                    Assert.Matches(@"^\{\s(tracks = )(MuloApi.Models.ModelUserTracks\[)([0-9]|)\]\s\}$",
+                        result.Value.ToString());
+                    continue;
+                }
+
+                result.AssertContains(_listResults.MethodGetSoundTracksUser());
+            }
         }
     }
 }

@@ -59,5 +59,23 @@ namespace XUnitTestMuloApi
             };
             return listResults;
         }
+
+        public JsonResult[] MethodGetSoundTracksUser()
+        {
+            var listResults = new[]
+            {
+                new JsonResult(new
+                    {
+                        error = "ERRORSERVER"
+                    })
+                    {StatusCode = 500},
+                new JsonResult(new
+                    {
+                        tracks = "empty"
+                    })
+                    {StatusCode = 200}
+            };
+            return listResults;
+        }
     }
 }
