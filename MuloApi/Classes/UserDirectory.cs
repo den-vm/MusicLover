@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MuloApi.Interfaces;
 using MuloApi.Models;
@@ -47,6 +48,23 @@ namespace MuloApi.Classes
                             tagsTrack.Tag.Title ?? "None")
                     select new ModelUserTracks {Id = idTrack, Name = nameTrack}).ToArray());
                 return tracksUser;
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+            }
+
+            return null;
+        }
+
+        public async Task<FileResult> GetActiveTrackUser(int idUser, int idTrack)
+        {
+            try
+            {
+                var trackBytes =
+                    await File.ReadAllBytesAsync(_defaultDirectoryUser + $"user_{idUser}" + $"/{idTrack}.mp3");
+                return new FileContentResult(trackBytes, "media/mpeg");
             }
             catch (Exception e)
             {

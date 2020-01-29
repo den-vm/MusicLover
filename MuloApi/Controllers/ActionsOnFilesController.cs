@@ -35,5 +35,21 @@ namespace MuloApi.Controllers
                 tracks = downloadedTrack
             });
         }
+
+        [HttpGet]
+        [Route("/user/{idUser:min(0)}/soundtracks/{idTrack:min(0)}.mp3")]
+        public async Task<ActionResult> PlaySoundTrack(int idUser, int idTrack)
+        {
+            IActionDirectory userDirectory = new UserDirectory();
+            var trackBinary = await userDirectory.GetActiveTrackUser(idUser, idTrack);
+            if (trackBinary == null)
+                return new JsonResult(new
+                    {
+                        error = "ERRORSERVER"
+                    })
+                    { StatusCode = 500 };
+            
+            return trackBinary;
+        }
     }
 }
