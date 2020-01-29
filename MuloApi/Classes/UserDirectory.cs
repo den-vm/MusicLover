@@ -34,8 +34,7 @@ namespace MuloApi.Classes
         {
             try
             {
-                var mp3List = await Task.Run(() =>
-                    ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters));
+                var mp3List = await ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters);
                 var tracksUser = await Task.Run(() => (from track in mp3List
                     select MusicFile.Create(track)
                     into tagsTrack
@@ -93,8 +92,7 @@ namespace MuloApi.Classes
         {
             try
             {
-                var mp3List = await Task.Run(() =>
-                    ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters));
+                var mp3List = await ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters);
 
                 var mp3ListId = await Task.Run(() => (from track in mp3List
                     select MusicFile.Create(track)
