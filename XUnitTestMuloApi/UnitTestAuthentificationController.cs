@@ -10,8 +10,6 @@ namespace XUnitTestMuloApi
 {
     public class UnitTestAuthentificationController
     {
-        private readonly ListResults _listResults = new ListResults();
-
         [Fact]
         public async void ConnectUserTest()
         {
@@ -94,7 +92,7 @@ namespace XUnitTestMuloApi
                     continue;
                 }
 
-                result.AssertContains(_listResults.MethodConnectUser());
+                result.AssertContains(ListResults.GetListResults().MethodConnectUser());
             }
         }
 
@@ -190,7 +188,7 @@ namespace XUnitTestMuloApi
                     continue;
                 }
 
-                result.AssertContains(_listResults.MethodCreateUser());
+                result.AssertContains(ListResults.GetListResults().MethodCreateUser());
             }
         }
 
@@ -198,7 +196,7 @@ namespace XUnitTestMuloApi
         public async void GetSoundTracksUserTest()
         {
             //Arrange
-            var resultsCreateUser = new List<JsonResult>();
+            var resultsGetTrackUser = new List<JsonResult>();
             var authentificationController = new AuthentificationController
             {
                 ControllerContext = new ControllerContext
@@ -211,39 +209,21 @@ namespace XUnitTestMuloApi
             for (var i = 0; i < 10; i++)
             {
                 var result = await authentificationController.GetSoundTracksUser(i);
-                resultsCreateUser.Add(result);
+                resultsGetTrackUser.Add(result);
             }
-
-            var settingDB = new StreamWriter(@"dbsettings.json");
-            var setConnect =
-                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplaye;user=mulobd;password=051291+Mulobd\" } }";
-            await settingDB.WriteLineAsync(setConnect);
-            settingDB.Close();
-
-            for (var i = 0; i < 10; i++)
-            {
-                var result = await authentificationController.GetSoundTracksUser(i);
-                resultsCreateUser.Add(result);
-            }
-
-            settingDB = new StreamWriter(@"dbsettings.json");
-            var setConnectOK =
-                "{\"ConnectionStrings\": { \"DefaultConnection\": \"server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd\" } }";
-            await settingDB.WriteLineAsync(setConnectOK);
-            settingDB.Close();
 
             // Assert
-            foreach (var result in resultsCreateUser)
+            foreach (var result in resultsGetTrackUser)
             {
                 Assert.NotNull(result);
                 if (result.Value.ToString().Contains("MuloApi.Models.ModelUserTracks"))
                 {
-                    Assert.Matches(@"^\{\s(tracks = )(MuloApi.Models.ModelUserTracks\[)([0-9]|)\]\s\}$",
+                    Assert.Matches(@"^\{\s(tracks = )(MuloApi.Models.ModelUserTracks\[)([0-9]+|)\]\s\}$",
                         result.Value.ToString());
                     continue;
                 }
 
-                result.AssertContains(_listResults.MethodGetSoundTracksUser());
+                result.AssertContains(ListResults.GetListResults().MethodGetSoundTracksUser());
             }
         }
     }

@@ -1,9 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TagLib.Riff;
 
 namespace XUnitTestMuloApi
 {
     internal class ListResults : IQueryResults
     {
+        private static ListResults _instance;
+
+        public static ListResults GetListResults()
+        {
+            return _instance ??= new ListResults();
+        }
+
         public JsonResult[] MethodConnectUser()
         {
             var listResults = new[]
@@ -74,6 +82,19 @@ namespace XUnitTestMuloApi
                         tracks = "empty"
                     })
                     {StatusCode = 200}
+            };
+            return listResults;
+        }
+
+        public JsonResult[] MethodUploadSoundTrack()
+        {
+            var listResults = new[]
+            {
+                new JsonResult(new
+                    {
+                        error = "ERRORSERVER"
+                    })
+                    {StatusCode = 500}
             };
             return listResults;
         }
