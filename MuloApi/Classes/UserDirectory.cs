@@ -34,7 +34,8 @@ namespace MuloApi.Classes
         {
             try
             {
-                var mp3List = await ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters);
+                var mp3List =
+                    await ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters);
                 var tracksUser = await Task.Run(() => (from track in mp3List
                     select MusicFile.Create(track)
                     into tagsTrack
@@ -92,7 +93,8 @@ namespace MuloApi.Classes
         {
             try
             {
-                var mp3List = await ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters);
+                var mp3List =
+                    await ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters);
 
                 var mp3ListId = await Task.Run(() => (from track in mp3List
                     select MusicFile.Create(track)
@@ -112,10 +114,22 @@ namespace MuloApi.Classes
 
                 var newTrack = await Task.Run(() =>
                     MusicFile.Create(_defaultDirectoryUser + $"user_{idUser}" + $"/{mp3NewId}.mp3"));
+
+                if (newTrack.Tag.JoinedPerformers.Equals(""))
+                {
+                    newTrack.Tag.Performers = new[] { "Неизвестный исполнитель" };
+                }
+
+                if (newTrack.Tag.Title == null)
+                {
+                    var newTagTitle = (trackBinary as FileStream)?.Name.Split("\\").LastOrDefault()?.Split(".mp3")[0];
+                    newTrack.Tag.Title = newTagTitle;
+                }
+
+                newTrack.Save();
+
                 var nameTrack =
-                    string.Concat(
-                        newTrack.Tag.JoinedPerformers.Equals("") ? "None" : newTrack.Tag.JoinedPerformers, " - ",
-                        newTrack.Tag.Title ?? "None");
+                    string.Concat(newTrack.Tag.JoinedPerformers, " - ", newTrack.Tag.Title);
 
                 return new ModelUserTracks
                 {
