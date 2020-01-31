@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MuloApi.Interfaces;
 using MuloApi.Models;
+using TagLib.IFD.Tags;
 using MusicFile = TagLib.File;
 
 namespace MuloApi.Classes
@@ -43,9 +45,7 @@ namespace MuloApi.Classes
                         .Split(".")[0]
                         .Substring(1))
                     let nameTrack =
-                        string.Concat(
-                            tagsTrack.Tag.JoinedPerformers.Equals("") ? "None" : tagsTrack.Tag.JoinedPerformers, " - ",
-                            tagsTrack.Tag.Title ?? "None")
+                        string.Concat(tagsTrack.Tag.JoinedPerformers, " - ", tagsTrack.Tag.Title)
                     select new ModelUserTracks {Id = idTrack, Name = nameTrack}).ToArray());
                 return tracksUser;
             }
@@ -116,14 +116,11 @@ namespace MuloApi.Classes
                     MusicFile.Create(_defaultDirectoryUser + $"user_{idUser}" + $"/{mp3NewId}.mp3"));
 
                 if (newTrack.Tag.JoinedPerformers.Equals(""))
-                {
-                    newTrack.Tag.Performers = new[] { "Неизвестный исполнитель" };
-                }
+                    newTrack.Tag.Performers = new[] {"Неизвестный исполнитель"};
 
                 if (newTrack.Tag.Title == null)
                 {
-                    var newTagTitle = (trackBinary as FileStream)?.Name.Split("\\").LastOrDefault()?.Split(".mp3")[0];
-                    newTrack.Tag.Title = newTagTitle;
+                    newTrack.Tag.Title = "Без названия";
                 }
 
                 newTrack.Save();
