@@ -9,13 +9,14 @@ namespace MuloApi.DataBase.Control
 {
     public class ControlDataBase : IActionUser
     {
+        private readonly AppDBContent db = AppDBContent.Instance;
+
         public async Task<bool> AddUser(string login, string password)
         {
             try
             {
-                using var db = new AppDBContent<NewUser>();
-                var user = new NewUser {Login = login, Password = password};
-                await db.Users.AddAsync(user);
+                var newUser = new ModelUser {Login = login, Password = password};
+                await db.Users.AddAsync(newUser);
                 await db.SaveChangesAsync();
                 return true;
             }
@@ -32,7 +33,6 @@ namespace MuloApi.DataBase.Control
         {
             try
             {
-                using var db = new AppDBContent<ExistUser>();
                 var result = await db.Users.FirstOrDefaultAsync(user => user.Login.Equals(login));
                 if (result != null) return true;
             }
@@ -49,7 +49,6 @@ namespace MuloApi.DataBase.Control
         {
             try
             {
-                using var db = new AppDBContent<ExistUser>();
                 var result = await db.Users.FirstOrDefaultAsync(user => user.Login.Equals(login));
                 if (result != null)
                     return result.Id;

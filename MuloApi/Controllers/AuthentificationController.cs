@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MuloApi.Classes;
 using MuloApi.DataBase;
 using MuloApi.DataBase.Control;
 using MuloApi.DataBase.Control.Interfaces;
-using MuloApi.DataBase.Entities;
 using MuloApi.Interfaces;
 using MuloApi.Models;
 
@@ -20,34 +21,33 @@ namespace MuloApi.Controllers
         [Route("/authorization")]
         public async Task<JsonResult> ConnectUser(ModelConnectingUser dataUser)
         {
-            if (dataUser?.Login != null && dataUser?.Password != null)
+            try
             {
-                if (!_checkDataUser.CheckLoginRegular(dataUser.Login) ||
-                    !_checkDataUser.CheckPassword(dataUser.Password))
-                    return new JsonResult(new
-                        {
-                            errors = new
-                            {
-                                message = "INCORRECT_PASSWORD_OR_LOGIN"
-                            }
-                        })
-                        {StatusCode = 401};
+                if (dataUser?.Login != null && dataUser.Password != null)
+                    if (_checkDataUser.CheckLoginRegular(dataUser.Login) &&
+                        _checkDataUser.CheckPassword(dataUser.Password))
+                    {
+                        if (!await AppDBContent.TestConnection())
+                            return new JsonResult(new
+                                {
+                                    error = "ERRORSERVER"
+                                })
+                                {StatusCode = 521};
 
-                if (!await AppDBContent<NewUser>.TestConnection())
-                    return new JsonResult(new
-                        {
-                            error = "ERRORSERVER"
-                        })
-                        {StatusCode = 521};
-
-                var idUser = await _controlDBUser.GetUserId(dataUser.Login);
-                if (idUser != -1)
-                    return new JsonResult(new
-                        {
-                            user_id = idUser,
-                            login = dataUser.Login
-                        })
-                        {StatusCode = 200};
+                        var idUser = await _controlDBUser.GetUserId(dataUser.Login);
+                        if (idUser != -1)
+                            return new JsonResult(new
+                                {
+                                    user_id = idUser,
+                                    login = dataUser.Login
+                                })
+                                {StatusCode = 200};
+                    }
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
             }
 
             return new JsonResult(new
@@ -64,66 +64,74 @@ namespace MuloApi.Controllers
         [Route("/registration")]
         public async Task<JsonResult> CreateUser(ModelConnectingUser dataUser)
         {
-            if (dataUser?.Login != null && dataUser?.Password != null)
+            try
             {
-                if (!_checkDataUser.CheckLoginRegular(dataUser.Login))
-                    return new JsonResult(new
-                        {
-                            errors = new
-                            {
-                                message = "INCORRECT_LOGIN"
-                            }
-                        })
-                        {StatusCode = 401};
-
-                if (!_checkDataUser.CheckPassword(dataUser.Password))
-                    return new JsonResult(new
-                        {
-                            errors = new
-                            {
-                                message = "INCORRECT_PASSWORD"
-                            }
-                        })
-                        {StatusCode = 401};
-
-                if (!await AppDBContent<ExistUser>.TestConnection())
-                    return new JsonResult(new
-                        {
-                            error = "ERRORSERVER"
-                        })
-                        {StatusCode = 521};
-
-                var resultExist = await _controlDBUser.ExistUser(dataUser.Login);
-                if (resultExist)
-                    return new JsonResult(new
-                        {
-                            errors = new
-                            {
-                                message = "EXISTING_USER"
-                            }
-                        })
-                        {StatusCode = 401};
-
-                var resultAdd = await _controlDBUser.AddUser(dataUser.Login, dataUser.Password);
-                if (!resultAdd)
-                    return new JsonResult(new
-                        {
-                            error = "ERRORSERVER"
-                        })
-                        {StatusCode = 521};
-
-                var idUser = await _controlDBUser.GetUserId(dataUser.Login);
-                if (idUser != -1)
+                if (dataUser?.Login != null && dataUser.Password != null)
                 {
-                    IActionDirectory addDirectoryUser = new UserDirectory();
-                    addDirectoryUser.CreateDirectoryUser(idUser);
-                    return new JsonResult(new
-                        {
-                            user_id = idUser,
-                            login = dataUser.Login
-                        })
-                        {StatusCode = 200};
+                    if (!_checkDataUser.CheckLoginRegular(dataUser.Login))
+                        return new JsonResult(new
+                            {
+                                errors = new
+                                {
+                                    message = "INCORRECT_LOGIN"
+                                }
+                            })
+                            {StatusCode = 401};
+
+                    if (!_checkDataUser.CheckPassword(dataUser.Password))
+                        return new JsonResult(new
+                            {
+                                errors = new
+                                {
+                                    message = "INCORRECT_PASSWORD"
+                                }
+                            })
+                            {StatusCode = 401};
+
+                    if (!await AppDBContent.TestConnection())
+                        return new JsonResult(new
+                            {
+                                error = "ERRORSERVER"
+                            })
+                            {StatusCode = 521};
+
+                    var resultExist = await _controlDBUser.ExistUser(dataUser.Login);
+                    if (resultExist)
+                        return new JsonResult(new
+                            {
+                                errors = new
+                                {
+                                    message = "EXISTING_USER"
+                                }
+                            })
+                            {StatusCode = 401};
+
+                    var resultAdd = await _controlDBUser.AddUser(dataUser.Login, dataUser.Password);
+                    if (!resultAdd)
+                        return new JsonResult(new
+                            {
+                                error = "ERRORSERVER"
+                            })
+                            {StatusCode = 521};
+
+                    var idUser = await _controlDBUser.GetUserId(dataUser.Login);
+                    if (idUser != -1)
+                    {
+                        IActionDirectory addDirectoryUser = new UserDirectory();
+                        addDirectoryUser.CreateDirectoryUser(idUser);
+                        return new JsonResult(new
+                            {
+                                user_id = idUser,
+                                login = dataUser.Login
+                            })
+                            {StatusCode = 200};
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
             }
 
             return new JsonResult(new

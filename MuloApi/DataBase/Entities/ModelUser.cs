@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MuloApi.DataBase.Entities
 {
-    public class NewUser
+    public class ModelUser
     {
         public int Id { get; set; }
         [Required]
