@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MuloApi.Interfaces;
 using MuloApi.Models;
-using TagLib.IFD.Tags;
 using MusicFile = TagLib.File;
 
 namespace MuloApi.Classes
@@ -89,7 +89,7 @@ namespace MuloApi.Classes
             }
         }
 
-        public async Task<ModelUserTracks> SavedRootTrackUser(int idUser, Stream trackBinary)
+        public async Task<List<ModelUserTracks>> SavedRootTrackUser(int idUser, IFormFileCollection tracksCollection)
         {
             try
             {
@@ -106,33 +106,66 @@ namespace MuloApi.Classes
 
                 var mp3NewId = mp3ListId.Length > 0 ? mp3ListId.Max() + 1 : 0;
 
-                await using (var fileStream =
-                    new FileStream(_defaultDirectoryUser + $"user_{idUser}" + $"/{mp3NewId}.mp3", FileMode.Create))
+                var tracksSaved = new List<ModelUserTracks>();
+
+                foreach (var track in tracksCollection)
                 {
-                    await trackBinary.CopyToAsync(fileStream);
+                    if (!track.ContentType.Equals("audio/mpeg") || !(track.Length > 0))
+                        continue;
+                    await Task.Run(() =>
+                    {
+                        using (var fileStream = new FileStream(
+                            _defaultDirectoryUser + $"user_{idUser}" + $"/{mp3NewId}.mp3", FileMode.Create))
+                        {
+                            track.CopyTo(fileStream);
+                        }
+
+                        var tagTrackSaved =
+                            MusicFile.Create(_defaultDirectoryUser + $"user_{idUser}" + $"/{mp3NewId}.mp3");
+
+                        var removeTrackMp3 = track.FileName.Remove(track.FileName.Length - 4);
+                        var splitFileName = removeTrackMp3.Split("-");
+
+                        string newPerformance = "", newTitle = "";
+
+                        if (splitFileName.Length == 2) // Title from track.FileName
+                        {
+                            newPerformance = splitFileName[0]?.Trim(' ') ?? "";
+                            newTitle = splitFileName[1]?.Trim(' ') ?? "";
+                        }
+
+                        var newTagTrack = new
+                        {
+                            Performance = newPerformance,
+                            Title = newTitle
+                        }; // Tags track from track.FileName
+
+                        if (tagTrackSaved.Tag.JoinedPerformers.Equals(""))
+                            tagTrackSaved.Tag.Performers = newTagTrack.Performance.Equals("")
+                                ? new[] {"Неизвестный исполнитель"}
+                                : new[] {newTagTrack.Performance};
+
+                        if (tagTrackSaved.Tag.Title == null)
+                            tagTrackSaved.Tag.Title = newTagTrack.Title.Equals("")
+                                ? track.FileName.Remove(track.FileName.Length - 4)
+                                : newTagTrack.Title;
+
+                        tagTrackSaved.Save();
+
+                        var nameTracks =
+                            string.Concat(tagTrackSaved.Tag.JoinedPerformers, " - ", tagTrackSaved.Tag.Title);
+
+                        tracksSaved.Add(new ModelUserTracks
+                        {
+                            Id = mp3NewId,
+                            Name = nameTracks
+                        });
+
+                        mp3NewId++;
+                    });
                 }
 
-                var newTrack = await Task.Run(() =>
-                    MusicFile.Create(_defaultDirectoryUser + $"user_{idUser}" + $"/{mp3NewId}.mp3"));
-
-                if (newTrack.Tag.JoinedPerformers.Equals(""))
-                    newTrack.Tag.Performers = new[] {"Неизвестный исполнитель"};
-
-                if (newTrack.Tag.Title == null)
-                {
-                    newTrack.Tag.Title = "Без названия";
-                }
-
-                newTrack.Save();
-
-                var nameTrack =
-                    string.Concat(newTrack.Tag.JoinedPerformers, " - ", newTrack.Tag.Title);
-
-                return new ModelUserTracks
-                {
-                    Id = mp3NewId,
-                    Name = nameTrack
-                };
+                return tracksSaved;
             }
             catch (Exception e)
             {

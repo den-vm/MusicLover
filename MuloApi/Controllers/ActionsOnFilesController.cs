@@ -1,13 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using MuloApi.Classes;
 using MuloApi.Interfaces;
-using Org.BouncyCastle.Crypto.Tls;
-using Org.BouncyCastle.Ocsp;
 
 namespace MuloApi.Controllers
 {
@@ -16,12 +11,11 @@ namespace MuloApi.Controllers
     {
         [HttpPost]
         [Route("/user/{idUser:min(0)}/soundtracks/upload")]
-        public async Task<JsonResult> UploadSoundTrack(int idUser)
+        public async Task<JsonResult> UploadSoundTrack(int idUser, IFormFileCollection tracks)
         {
-            var soundtrackBinary = Request.Body;
             IActionDirectory userDirectory = new UserDirectory();
-            var downloadedTrack = await userDirectory.SavedRootTrackUser(idUser, soundtrackBinary);
-            if (downloadedTrack == null)
+            var downloadedTrack = await userDirectory.SavedRootTrackUser(idUser, tracks);
+            if (downloadedTrack == null || downloadedTrack.Count == 0)
                 return new JsonResult(new
                     {
                         error = "ERRORSERVER"
