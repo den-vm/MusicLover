@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MuloApi.Classes;
@@ -15,11 +16,11 @@ namespace MuloApi.Controllers
     public class AuthentificationController : ControllerBase
     {
         private readonly ICheckData _checkDataUser = new CheckDataUser();
-        private readonly IActionUser _controlDBUser = new ControlDataBase();
+        private readonly IActionUser _controlDbUser = ControlDataBase.Current;
 
         [HttpPost]
         [Route("/authorization")]
-        public async Task<JsonResult> ConnectUser(ModelConnectingUser dataUser)
+        public async Task<ActionResult> ConnectUser(ModelConnectingUser dataUser)
         {
             try
             {
@@ -34,14 +35,23 @@ namespace MuloApi.Controllers
                                 })
                                 {StatusCode = 521};
 
-                        var idUser = await _controlDBUser.GetUserId(dataUser.Login);
+                        var idUser = await _controlDbUser.GetUserId(dataUser.Login);
+
                         if (idUser != -1)
+                        {
+                            var hashUser = await _controlDbUser.SaveHashUser(idUser, Request.Headers);
+                            var newSettingCookie = new CookieOptions
+                            {
+                                HttpOnly = true
+                            };
+                            Response.Cookies.Append("session", hashUser, newSettingCookie);
                             return new JsonResult(new
                                 {
                                     user_id = idUser,
                                     login = dataUser.Login
                                 })
                                 {StatusCode = 200};
+                        }
                     }
             }
             catch (Exception e)
@@ -62,7 +72,7 @@ namespace MuloApi.Controllers
 
         [HttpPost]
         [Route("/registration")]
-        public async Task<JsonResult> CreateUser(ModelConnectingUser dataUser)
+        public async Task<ActionResult> CreateUser(ModelConnectingUser dataUser)
         {
             try
             {
@@ -95,7 +105,7 @@ namespace MuloApi.Controllers
                             })
                             {StatusCode = 521};
 
-                    var resultExist = await _controlDBUser.ExistUser(dataUser.Login);
+                    var resultExist = await _controlDbUser.ExistUser(dataUser.Login);
                     if (resultExist)
                         return new JsonResult(new
                             {
@@ -106,7 +116,7 @@ namespace MuloApi.Controllers
                             })
                             {StatusCode = 401};
 
-                    var resultAdd = await _controlDBUser.AddUser(dataUser.Login, dataUser.Password);
+                    var resultAdd = await _controlDbUser.AddUser(dataUser.Login, dataUser.Password);
                     if (!resultAdd)
                         return new JsonResult(new
                             {
@@ -114,7 +124,7 @@ namespace MuloApi.Controllers
                             })
                             {StatusCode = 521};
 
-                    var idUser = await _controlDBUser.GetUserId(dataUser.Login);
+                    var idUser = await _controlDbUser.GetUserId(dataUser.Login);
                     if (idUser != -1)
                     {
                         IActionDirectory addDirectoryUser = new UserDirectory();
@@ -143,8 +153,13 @@ namespace MuloApi.Controllers
 
         [HttpGet]
         [Route("/user/{idUser:min(0)}/soundtracks")]
-        public async Task<JsonResult> GetSoundTracksUser(int idUser)
+        public async Task<ActionResult> GetSoundTracksUser(int idUser)
         {
+            if (!Request.Cookies.ContainsKey("session"))
+                return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
+            if (!await _controlDbUser.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
+                return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
+
             IActionDirectory userDirectory = new UserDirectory();
             var listTracks = await userDirectory.GetRootTracksUser(idUser);
             if (listTracks == null)

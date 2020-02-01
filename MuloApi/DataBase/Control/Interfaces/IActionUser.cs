@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace MuloApi.DataBase.Control.Interfaces
 {
@@ -10,5 +8,7 @@ namespace MuloApi.DataBase.Control.Interfaces
         Task<bool> AddUser(string login, string password);
         Task<bool> ExistUser(string login);
         Task<int> GetUserId(string login);
+        Task<string> SaveHashUser(int idUser, IHeaderDictionary headerUser);
+        Task<bool> CheckUserSession(string cookieUser, int idUser, IHeaderDictionary headerUser);
     }
 }

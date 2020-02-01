@@ -11,9 +11,10 @@ namespace MuloApi.DataBase
 {
     public class AppDBContent : DbContext
     {
-        public static AppDBContent Instance { get; } = new AppDBContent();
+        public static AppDBContent Current { get; } = new AppDBContent();
 
         public DbSet<ModelUser> Users { get; set; }
+        public DbSet<ModelHashUser> HashUsers { get; set; }
 
         protected override async void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -26,9 +27,9 @@ namespace MuloApi.DataBase
         {
             try
             {
-                await Instance.Database.OpenConnectionAsync();
-                if (Instance.Database.GetDbConnection().State != ConnectionState.Open) return false;
-                Instance.Database.CloseConnection();
+                await Current.Database.OpenConnectionAsync();
+                if (Current.Database.GetDbConnection().State != ConnectionState.Open) return false;
+                Current.Database.CloseConnection();
                 return true;
             }
             catch (Exception e)

@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MuloApi.Classes;
+using MuloApi.DataBase.Control;
+using MuloApi.DataBase.Control.Interfaces;
 using MuloApi.Interfaces;
 
 namespace MuloApi.Controllers
@@ -9,10 +11,18 @@ namespace MuloApi.Controllers
     [ApiController]
     public class ActionsOnFilesController : ControllerBase
     {
+        private readonly ICheckData _checkDataUser = new CheckDataUser();
+        private readonly IActionUser _controlDBUser = ControlDataBase.Current;
+
         [HttpPost]
         [Route("/user/{idUser:min(0)}/soundtracks/upload")]
-        public async Task<JsonResult> UploadSoundTrack(int idUser, IFormFileCollection tracks)
+        public async Task<ActionResult> UploadSoundTrack(int idUser, IFormFileCollection tracks)
         {
+            if (!Request.Cookies.ContainsKey("session"))
+                return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
+            if (!await _controlDBUser.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
+                return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
+
             IActionDirectory userDirectory = new UserDirectory();
             var downloadedTrack = await userDirectory.SavedRootTrackUser(idUser, tracks);
             if (downloadedTrack == null || downloadedTrack.Count == 0)
@@ -31,6 +41,11 @@ namespace MuloApi.Controllers
         [Route("/user/{idUser:min(0)}/soundtracks/{idTrack:min(0)}.mp3")]
         public async Task<ActionResult> PlaySoundTrack(int idUser, int idTrack)
         {
+            if (!Request.Cookies.ContainsKey("session"))
+                return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
+            if (!await _controlDBUser.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
+                return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
+
             IActionDirectory userDirectory = new UserDirectory();
             var trackBinary = await userDirectory.GetActiveTrackUser(idUser, idTrack);
             if (trackBinary == null)

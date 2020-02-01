@@ -1,4 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using MuloApi.Interfaces;
 
 namespace MuloApi.Classes
@@ -13,13 +16,32 @@ namespace MuloApi.Classes
 
         public bool CheckLoginSmtp(string login)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public bool CheckPassword(string pass)
         {
             var RegPassword = @"^[a-zA-Z][a-zA-Z]{5}$";
             return Regex.IsMatch(pass, RegPassword, RegexOptions.IgnoreCase);
+        }
+
+        public string GetHash(int idUser, string agent)
+        {
+            var setHashCode = Md5Hash(Md5Hash(idUser + agent));
+            return setHashCode;
+        }
+
+
+        private static string Md5Hash(string input)
+        {
+            var hash = new StringBuilder();
+            var md5Provider = new MD5CryptoServiceProvider();
+            var bytes = md5Provider.ComputeHash(new UTF8Encoding().GetBytes(input));
+
+            foreach (var t in bytes)
+                hash.Append(t.ToString("x2"));
+
+            return hash.ToString();
         }
     }
 }
