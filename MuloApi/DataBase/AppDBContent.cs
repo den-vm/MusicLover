@@ -1,27 +1,23 @@
 ﻿using System;
 using System.Data;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MuloApi.DataBase.Entities;
-using Newtonsoft.Json.Linq;
 
 namespace MuloApi.DataBase
 {
     public class AppDBContent : DbContext
     {
-        public static AppDBContent Current { get; } = new AppDBContent();
+        public AppDBContent(DbContextOptions<AppDBContent> options)
+            : base(options)
+        {
+        }
+
+        public static AppDBContent Current { get; set; }
 
         public DbSet<ModelUser> Users { get; set; }
         public DbSet<ModelHashUser> HashUsers { get; set; }
-
-        protected override async void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            var settingsFile = await File.ReadAllTextAsync(@"dbsettings.json");
-            var connectString = (string) JObject.Parse(settingsFile)["ConnectionStrings"]["DefaultConnection"];
-            optionsBuilder.UseMySQL(connectString);
-        }
 
         public static async Task<bool> TestConnection()
         {

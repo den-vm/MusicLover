@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace MuloApi.DataBase.Control.Interfaces
 {
-    internal interface IActionUser
+    public interface IActionUser
     {
         Task<bool> AddUser(string login, string password);
         Task<bool> ExistUser(string login);
