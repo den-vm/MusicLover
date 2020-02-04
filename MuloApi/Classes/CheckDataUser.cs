@@ -19,7 +19,7 @@ namespace MuloApi.Classes
             throw new NotImplementedException();
         }
 
-        public bool CheckPassword(string pass)
+        public bool CheckPasswordRegular(string pass)
         {
             var RegPassword = @"^[a-zA-Z][a-zA-Z]{5}$";
             return Regex.IsMatch(pass, RegPassword, RegexOptions.IgnoreCase);

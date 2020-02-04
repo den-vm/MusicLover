@@ -3,11 +3,11 @@
     /// <summary>
     ///     Проверка входных данных пользователя
     /// </summary>
-    internal interface ICheckData
+    public interface ICheckData
     {
         bool CheckLoginRegular(string login);
         bool CheckLoginSmtp(string login);
-        bool CheckPassword(string password);
+        bool CheckPasswordRegular(string password);
         string GetHash(int idUser, string agent);
     }
 }

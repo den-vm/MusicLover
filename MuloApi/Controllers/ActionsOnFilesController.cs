@@ -11,15 +11,15 @@ namespace MuloApi.Controllers
     [ApiController]
     public class ActionsOnFilesController : ControllerBase
     {
+        public IActionUser ControlDataBase = new ControlDataBase();
+
         [HttpPost]
         [Route("/user/{idUser:min(0)}/soundtracks/upload")]
         public async Task<ActionResult> UploadSoundTrack(int idUser, IFormFileCollection tracks)
         {
-            IActionUser controlDataBase = new ControlDataBase();
-
             if (!Request.Cookies.ContainsKey("session"))
                 return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
-            if (!await controlDataBase.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
+            if (!await ControlDataBase.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
                 return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
 
             IActionDirectory userDirectory = new UserDirectory();
@@ -40,11 +40,9 @@ namespace MuloApi.Controllers
         [Route("/user/{idUser:min(0)}/soundtracks/{idTrack:min(0)}.mp3")]
         public async Task<ActionResult> PlaySoundTrack(int idUser, int idTrack)
         {
-            IActionUser controlDataBase = new ControlDataBase();
-
             if (!Request.Cookies.ContainsKey("session"))
                 return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
-            if (!await controlDataBase.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
+            if (!await ControlDataBase.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
                 return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
 
             IActionDirectory userDirectory = new UserDirectory();

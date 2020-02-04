@@ -15,17 +15,18 @@ namespace MuloApi.Controllers
     [ApiController]
     public class AuthentificationController : ControllerBase
     {
+        public ICheckData CheckDataUser = new CheckDataUser();
+        public IActionUser ControlDataBase = new ControlDataBase();
+
         [HttpPost]
         [Route("/authorization")]
         public async Task<ActionResult> ConnectUser(ModelConnectingUser dataUser)
         {
-            ICheckData checkDataUser = new CheckDataUser();
-            IActionUser controlDataBase = new ControlDataBase();
             try
             {
                 if (dataUser?.Login != null && dataUser.Password != null)
-                    if (checkDataUser.CheckLoginRegular(dataUser.Login) &&
-                        checkDataUser.CheckPassword(dataUser.Password))
+                    if (CheckDataUser.CheckLoginRegular(dataUser.Login) &&
+                        CheckDataUser.CheckPasswordRegular(dataUser.Password))
                     {
                         if (!await AppDBContent.TestConnection())
                             return new JsonResult(new
@@ -34,11 +35,11 @@ namespace MuloApi.Controllers
                                 })
                                 {StatusCode = 521};
 
-                        var idUser = await controlDataBase.GetUserId(dataUser.Login);
+                        var idUser = await ControlDataBase.GetUserId(dataUser.Login);
 
                         if (idUser != -1)
                         {
-                            var hashUser = await controlDataBase.SaveHashUser(idUser, Request.Headers);
+                            var hashUser = await ControlDataBase.SaveHashUser(idUser, Request.Headers);
                             var newSettingCookie = new CookieOptions
                             {
                                 HttpOnly = true
@@ -73,13 +74,11 @@ namespace MuloApi.Controllers
         [Route("/registration")]
         public async Task<ActionResult> CreateUser(ModelConnectingUser dataUser)
         {
-            ICheckData checkDataUser = new CheckDataUser();
-            IActionUser controlDataBase = new ControlDataBase();
             try
             {
                 if (dataUser?.Login != null && dataUser.Password != null)
                 {
-                    if (!checkDataUser.CheckLoginRegular(dataUser.Login))
+                    if (!CheckDataUser.CheckLoginRegular(dataUser.Login))
                         return new JsonResult(new
                             {
                                 errors = new
@@ -89,7 +88,7 @@ namespace MuloApi.Controllers
                             })
                             {StatusCode = 401};
 
-                    if (!checkDataUser.CheckPassword(dataUser.Password))
+                    if (!CheckDataUser.CheckPasswordRegular(dataUser.Password))
                         return new JsonResult(new
                             {
                                 errors = new
@@ -106,7 +105,7 @@ namespace MuloApi.Controllers
                             })
                             {StatusCode = 521};
 
-                    var resultExist = await controlDataBase.ExistUser(dataUser.Login);
+                    var resultExist = await ControlDataBase.ExistUser(dataUser.Login);
                     if (resultExist)
                         return new JsonResult(new
                             {
@@ -117,7 +116,7 @@ namespace MuloApi.Controllers
                             })
                             {StatusCode = 401};
 
-                    var resultAdd = await controlDataBase.AddUser(dataUser.Login, dataUser.Password);
+                    var resultAdd = await ControlDataBase.AddUser(dataUser.Login, dataUser.Password);
                     if (!resultAdd)
                         return new JsonResult(new
                             {
@@ -125,7 +124,7 @@ namespace MuloApi.Controllers
                             })
                             {StatusCode = 521};
 
-                    var idUser = await controlDataBase.GetUserId(dataUser.Login);
+                    var idUser = await ControlDataBase.GetUserId(dataUser.Login);
                     if (idUser != -1)
                     {
                         IActionDirectory addDirectoryUser = new UserDirectory();
@@ -156,11 +155,9 @@ namespace MuloApi.Controllers
         [Route("/user/{idUser:min(0)}/soundtracks")]
         public async Task<ActionResult> GetSoundTracksUser(int idUser)
         {
-            IActionUser controlDataBase = new ControlDataBase();
-
             if (!Request.Cookies.ContainsKey("session"))
                 return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
-            if (!await controlDataBase.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
+            if (!await ControlDataBase.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
                 return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
 
             IActionDirectory userDirectory = new UserDirectory();
