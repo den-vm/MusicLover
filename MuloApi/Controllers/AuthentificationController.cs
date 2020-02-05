@@ -16,7 +16,8 @@ namespace MuloApi.Controllers
     public class AuthentificationController : ControllerBase
     {
         public ICheckData CheckDataUser = new CheckDataUser();
-        public IActionUser ControlDataBase = new ControlDataBase();
+        public IActionUser ControlDataBase = new ActionUserDataBase();
+        public IControlDataBase DataBase = new AppDbContent().Current;
 
         [HttpPost]
         [Route("/authorization")]
@@ -28,7 +29,7 @@ namespace MuloApi.Controllers
                     if (CheckDataUser.CheckLoginRegular(dataUser.Login) &&
                         CheckDataUser.CheckPasswordRegular(dataUser.Password))
                     {
-                        if (!await AppDBContent.TestConnection())
+                        if (!await DataBase.TestConnection())
                             return new JsonResult(new
                                 {
                                     error = "ERRORSERVER"
@@ -98,7 +99,7 @@ namespace MuloApi.Controllers
                             })
                             {StatusCode = 401};
 
-                    if (!await AppDBContent.TestConnection())
+                    if (!await DataBase.TestConnection())
                         return new JsonResult(new
                             {
                                 error = "ERRORSERVER"

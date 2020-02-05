@@ -1,25 +1,43 @@
 ﻿using System;
 using System.Data;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MuloApi.DataBase.Entities;
+using MuloApi.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace MuloApi.DataBase
 {
-    public class AppDBContent : DbContext
+    public class AppDbContent : DbContext, IControlDataBase
     {
-        public AppDBContent(DbContextOptions<AppDBContent> options)
+        private static AppDbContent _instance;
+
+        public AppDbContent(DbContextOptions options)
             : base(options)
         {
         }
 
-        public static AppDBContent Current { get; set; }
+        public AppDbContent()
+        {
+
+        }
+
+        public AppDbContent Current
+        {
+            get
+            {
+                var options = new DbContextOptionsBuilder<AppDbContent>()
+                    .UseMySQL(GetStrConnection().Result).Options;
+                return _instance ??= new AppDbContent(options);
+            }
+        }
 
         public DbSet<ModelUser> Users { get; set; }
         public DbSet<ModelHashUser> HashUsers { get; set; }
 
-        public static async Task<bool> TestConnection()
+        public async Task<bool> TestConnection()
         {
             try
             {
@@ -34,6 +52,13 @@ namespace MuloApi.DataBase
                     await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
                 return false;
             }
+        }
+
+        public async Task<string> GetStrConnection()
+        {
+            var settingsFile = await Task.Run(() => File.ReadAllText(@"dbsettings.json"));
+            var connectString = (string) JObject.Parse(settingsFile)["ConnectionStrings"]["DefaultConnection"];
+            return connectString;
         }
     }
 }

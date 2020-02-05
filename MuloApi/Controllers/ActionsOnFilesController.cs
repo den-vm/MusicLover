@@ -11,7 +11,7 @@ namespace MuloApi.Controllers
     [ApiController]
     public class ActionsOnFilesController : ControllerBase
     {
-        public IActionUser ControlDataBase = new ControlDataBase();
+        public IActionUser ControlDataBase = new ActionUserDataBase();
 
         [HttpPost]
         [Route("/user/{idUser:min(0)}/soundtracks/upload")]
