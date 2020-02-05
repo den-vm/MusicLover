@@ -25,6 +25,7 @@ namespace MuloApi
             try
             {
                 services.AddControllers();
+                services.AddCors();
             }
             catch (Exception e)
             {
@@ -39,6 +40,8 @@ namespace MuloApi
             {
                 LoggerApp = logger;
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+
+                app.UseCors(builder => builder.WithOrigins("http://musiclover.uxp.ru"));
 
                 app.UseHttpsRedirection();
 
