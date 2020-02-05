@@ -130,6 +130,12 @@ namespace MuloApi.Controllers
                     {
                         IActionDirectory addDirectoryUser = new UserDirectory();
                         addDirectoryUser.CreateDirectoryUser(idUser);
+                        var hashUser = await ControlDataBase.SaveHashUser(idUser, Request.Headers);
+                        var newSettingCookie = new CookieOptions
+                        {
+                            HttpOnly = true
+                        };
+                        Response.Cookies.Append("session", hashUser, newSettingCookie);
                         return new JsonResult(new
                             {
                                 user_id = idUser,
