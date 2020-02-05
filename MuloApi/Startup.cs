@@ -41,7 +41,10 @@ namespace MuloApi
                 LoggerApp = logger;
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
-                app.UseCors(builder => builder.WithOrigins("http://musiclover.uxp.ru"));
+                app.UseCors(builder => builder.WithOrigins("http://musiclover.uxp.ru")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials());
 
                 app.UseHttpsRedirection();
 
