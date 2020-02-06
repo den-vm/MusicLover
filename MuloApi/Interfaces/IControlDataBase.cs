@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using MuloApi.DataBase.Entities;
+﻿using System.Threading.Tasks;
 
 namespace MuloApi.Interfaces
 {

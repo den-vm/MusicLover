@@ -1,16 +1,20 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MuloApi.Classes;
+using MuloApi.DataBase;
+using MuloApi.DataBase.Control;
 
 namespace MuloApi
 {
     public class Startup
     {
-        public static ILogger<Program> LoggerApp;
+        public static ILogger LoggerApp;
 
         public Startup(IConfiguration configuration, IHostEnvironment host)
         {
@@ -34,11 +38,13 @@ namespace MuloApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Program> logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             try
             {
-                LoggerApp = logger;
+                loggerFactory.AddFile("../log/log_mulo_api.txt");
+                LoggerApp = loggerFactory.CreateLogger("Application");
+
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
                 app.UseCors(builder => builder.WithOrigins("http://musiclover.uxp.ru")
@@ -46,13 +52,15 @@ namespace MuloApi
                     .AllowAnyMethod()
                     .AllowCredentials());
 
-                app.UseHttpsRedirection();
-
                 app.UseRouting();
 
-                app.UseAuthorization();
-
                 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+                var createConnecting = new AppDbContent().Current;
+                _ = new CheckDataUser().Current;
+                _ = new ActionUserDataBase().Current;
+                LoggerApp.LogWarning(createConnecting.TestConnection().Result
+                    ? $"База данных <{createConnecting.Database.GetDbConnection().Database}> доступна"
+                    : $"База данных <{createConnecting.Database.GetDbConnection().Database}> недоступна");
             }
             catch (Exception e)
             {

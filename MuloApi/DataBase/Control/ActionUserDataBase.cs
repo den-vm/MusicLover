@@ -12,7 +12,14 @@ namespace MuloApi.DataBase.Control
 {
     public class ActionUserDataBase : IActionUser
     {
+        private static ActionUserDataBase _instance;
+
         public AppDbContent DataBase = new AppDbContent().Current;
+
+        public ActionUserDataBase Current
+        {
+            get { return _instance ??= new ActionUserDataBase(); }
+        }
 
         public async Task<bool> AddUser(string login, string password)
         {

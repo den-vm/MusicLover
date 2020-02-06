@@ -1,14 +1,14 @@
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MuloApi.DataBase;
 
 namespace MuloApi
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -19,18 +19,8 @@ namespace MuloApi
                 .UseKestrel()
                 .UseConfiguration(config)
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .ConfigureLogging((hostingContext, logging) =>
-                {
-                    // Requires `using Microsoft.Extensions.Logging;`
-                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                    logging.AddConsole();
-                    logging.AddDebug();
-                    logging.AddEventSourceLogger();
-                    logging.AddFile("../log/log_mulo_api.txt");
-                })
                 .UseStartup<Startup>()
                 .Build();
-            _ = new AppDbContent().Current;
             host.Run();
         }
     }

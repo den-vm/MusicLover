@@ -21,8 +21,10 @@ namespace MuloApi.DataBase
 
         public AppDbContent()
         {
-
         }
+
+        public DbSet<ModelUser> Users { get; set; }
+        public DbSet<ModelHashUser> HashUsers { get; set; }
 
         public AppDbContent Current
         {
@@ -33,9 +35,6 @@ namespace MuloApi.DataBase
                 return _instance ??= new AppDbContent(options);
             }
         }
-
-        public DbSet<ModelUser> Users { get; set; }
-        public DbSet<ModelHashUser> HashUsers { get; set; }
 
         public async Task<bool> TestConnection()
         {

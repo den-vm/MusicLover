@@ -8,6 +8,13 @@ namespace MuloApi.Classes
 {
     public class CheckDataUser : ICheckData
     {
+        private static CheckDataUser _instance;
+
+        public CheckDataUser Current
+        {
+            get { return _instance ??= new CheckDataUser(); }
+        }
+
         public bool CheckLoginRegular(string login)
         {
             var RegEmail = @"^((\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*)\s*[;]{0,1}\s*)+$";
