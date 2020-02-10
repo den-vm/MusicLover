@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace MuloApi.DataBase.Entities
 {
@@ -9,5 +10,7 @@ namespace MuloApi.DataBase.Entities
         [Required] public int IdUser { get; set; }
 
         [Required] public string Cookie { get; set; }
+        [Required] public DateTime Start { get; set; }
+        [Required] public DateTime End { get; set; }
     }
 }

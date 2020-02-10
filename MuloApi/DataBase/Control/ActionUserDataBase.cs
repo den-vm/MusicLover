@@ -86,7 +86,13 @@ namespace MuloApi.DataBase.Control
                 if (result != null)
                     return result.Cookie;
 
-                var newHashUser = new ModelCookieUser {IdUser = idUser, Cookie = hashUser};
+                var newHashUser = new ModelCookieUser
+                {
+                    IdUser = idUser, 
+                    Cookie = hashUser,
+                    Start = DateTime.Now,
+                    End = DateTime.Now.AddHours(24)
+                };
                 await DataBase.HashUsers.AddAsync(newHashUser);
                 await DataBase.SaveChangesAsync();
             }
