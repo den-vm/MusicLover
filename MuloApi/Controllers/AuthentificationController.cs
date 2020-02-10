@@ -39,12 +39,6 @@ namespace MuloApi.Controllers
                         var idUser = await ControlDataBase.GetUserId(dataUser.Login);
 
                         if (idUser != -1)
-                            //var hashUser = await ControlDataBase.SaveHashUser(idUser, Request.Headers);
-                            //var newSettingCookie = new CookieOptions
-                            //{
-                            //    HttpOnly = true
-                            //};
-                            //Response.Cookies.Append("session", hashUser, newSettingCookie);
                             return new JsonResult(new
                                 {
                                     user_id = idUser,
@@ -128,12 +122,6 @@ namespace MuloApi.Controllers
                     {
                         IActionDirectory addDirectoryUser = new UserDirectory();
                         addDirectoryUser.CreateDirectoryUser(idUser);
-                        //var hashUser = await ControlDataBase.SaveHashUser(idUser, Request.Headers);
-                        //var newSettingCookie = new CookieOptions
-                        //{
-                        //    HttpOnly = true
-                        //};
-                        //Response.Cookies.Append("session", hashUser, newSettingCookie);
                         return new JsonResult(new
                             {
                                 user_id = idUser,
@@ -160,11 +148,6 @@ namespace MuloApi.Controllers
         [Route("/user/{idUser:min(0)}/soundtracks")]
         public async Task<ActionResult> GetSoundTracksUser(int idUser)
         {
-            //if (!Request.Cookies.ContainsKey("session"))
-            //    return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
-            //if (!await ControlDataBase.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
-            //    return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
-
             IActionDirectory userDirectory = new UserDirectory();
             var listTracks = await userDirectory.GetRootTracksUser(idUser);
             if (listTracks == null)

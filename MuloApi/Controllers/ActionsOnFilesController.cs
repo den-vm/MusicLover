@@ -17,11 +17,6 @@ namespace MuloApi.Controllers
         [Route("/user/{idUser:min(0)}/soundtracks/upload")]
         public async Task<ActionResult> UploadSoundTrack(int idUser, IFormFileCollection tracks)
         {
-            //if (!Request.Cookies.ContainsKey("session"))
-            //    return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
-            //if (!await ControlDataBase.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
-            //    return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
-
             IActionDirectory userDirectory = new UserDirectory();
             var downloadedTrack = await userDirectory.SavedRootTrackUser(idUser, tracks);
             if (downloadedTrack == null || downloadedTrack.Count == 0)
@@ -40,11 +35,6 @@ namespace MuloApi.Controllers
         [Route("/user/{idUser:min(0)}/soundtracks/{idTrack:min(0)}.mp3")]
         public async Task<ActionResult> PlaySoundTrack(int idUser, int idTrack)
         {
-            //if (!Request.Cookies.ContainsKey("session"))
-            //    return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
-            //if (!await ControlDataBase.CheckUserSession(Request.Cookies["session"], idUser, Request.Headers))
-            //    return RedirectToRoute(new {controller = "Authentification", action = "ConnectUser"});
-
             IActionDirectory userDirectory = new UserDirectory();
             var trackBinary = await userDirectory.GetActiveTrackUser(idUser, idTrack);
             if (trackBinary == null)
