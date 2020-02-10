@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using MuloApi.Classes;
 using MuloApi.DataBase;
 using MuloApi.DataBase.Control;
+using MuloApi.Filters;
 
 namespace MuloApi
 {
@@ -29,6 +30,7 @@ namespace MuloApi
             try
             {
                 services.AddControllers();
+                services.AddControllersWithViews(option => { option.Filters.Add(typeof(SingleActionFilter)); });
                 services.AddCors();
             }
             catch (Exception e)
@@ -58,6 +60,7 @@ namespace MuloApi
                 var createConnecting = new AppDbContent().Current;
                 _ = new CheckDataUser().Current;
                 _ = new ActionUserDataBase().Current;
+
                 LoggerApp.LogWarning(createConnecting.TestConnection().Result
                     ? $"База данных <{createConnecting.Database.GetDbConnection().Database}> доступна"
                     : $"База данных <{createConnecting.Database.GetDbConnection().Database}> недоступна");
