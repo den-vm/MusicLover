@@ -8,7 +8,8 @@ namespace MuloApi.DataBase.Control.Interfaces
         Task<bool> AddUser(string login, string password);
         Task<bool> ExistUser(string login);
         Task<int> GetUserId(string login);
-        Task<string> SaveHashUser(int idUser, IHeaderDictionary headerUser);
-        Task<bool> CheckUserSession(string cookieUser, int idUser, IHeaderDictionary headerUser);
+        Task<string> SaveCookieUser(int idUser, IHeaderDictionary headerRequest);
+        Task<bool?> CheckCookieUser(string cookieUser, int idUser, IHeaderDictionary headerRequest);
+        Task<bool?> DeleteCookieUser(int idUser, string cookie);
     }
 }

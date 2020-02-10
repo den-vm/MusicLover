@@ -71,38 +71,75 @@ namespace MuloApi.DataBase.Control
             return -1;
         }
 
-        public async Task<string> SaveHashUser(int idUser, IHeaderDictionary headerUser)
+        public async Task<string> SaveCookieUser(int idUser, IHeaderDictionary headerRequest)
         {
-            var checkDataUser = new CheckDataUser();
-            var agent = (from header in headerUser
-                where header.Key.Equals("User-Agent")
-                select header.Value).ToArray().LastOrDefault()[0];
-            var hashUser = checkDataUser.GetHash(idUser, agent);
+            try
+            {
+                var checkDataUser = new CheckDataUser();
+                var agent = (from header in headerRequest
+                    where header.Key.Equals("User-Agent")
+                    select header.Value).ToArray().LastOrDefault()[0];
+                var hashUser = checkDataUser.GetHash(idUser, agent);
+                var result =
+                    await DataBase.HashUsers.FirstOrDefaultAsync(hash =>
+                        hash.IdUser.Equals(idUser) && hash.Cookie.Equals(hashUser));
+                if (result != null)
+                    return result.Cookie;
 
-            var result =
-                await DataBase.HashUsers.FirstOrDefaultAsync(hash =>
-                    hash.IdUser.Equals(idUser) && hash.HashUser.Equals(hashUser));
-            if (result != null)
-                return result.HashUser;
+                var newHashUser = new ModelCookieUser {IdUser = idUser, Cookie = hashUser};
+                await DataBase.HashUsers.AddAsync(newHashUser);
+                await DataBase.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+            }
 
-            var newHashUser = new ModelHashUser {IdUser = idUser, HashUser = hashUser};
-            await DataBase.HashUsers.AddAsync(newHashUser);
-            await DataBase.SaveChangesAsync();
-
-            return hashUser;
+            return null;
         }
 
-        public async Task<bool> CheckUserSession(string cookieUser, int idUser, IHeaderDictionary headerUser)
+        public async Task<bool?> CheckCookieUser(string cookieUser, int idUser, IHeaderDictionary headerRequest)
         {
-            var checkDataUser = new CheckDataUser();
-            var agent = (from header in headerUser
-                where header.Key.Equals("User-Agent")
-                select header.Value).ToArray().LastOrDefault()[0];
-            var hashUser = checkDataUser.GetHash(idUser, agent);
-            var result =
-                await DataBase.HashUsers.FirstOrDefaultAsync(hash =>
-                    hash.IdUser.Equals(idUser) && hash.HashUser.Equals(hashUser));
-            return result != null && result.HashUser.Equals(hashUser);
+            try
+            {
+                var checkDataUser = new CheckDataUser();
+                var agent = (from header in headerRequest
+                    where header.Key.Equals("User-Agent")
+                    select header.Value).ToArray().LastOrDefault()[0];
+                var hashUser = checkDataUser.GetHash(idUser, agent);
+                var result =
+                    await DataBase.HashUsers.FirstOrDefaultAsync(hash =>
+                        hash.IdUser.Equals(idUser) && hash.Cookie.Equals(hashUser));
+                return result != null && result.Cookie.Equals(hashUser);
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+            }
+
+            return null;
+        }
+
+        public async Task<bool?> DeleteCookieUser(int idUser, string cookie)
+        {
+            try
+            {
+                var resultSearch =
+                    await DataBase.HashUsers.FirstOrDefaultAsync(hash =>
+                        hash.IdUser.Equals(idUser) && hash.Cookie.Equals(cookie));
+                DataBase.HashUsers.Remove(resultSearch);
+                await DataBase.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+            }
+
+            return null;
         }
     }
 }

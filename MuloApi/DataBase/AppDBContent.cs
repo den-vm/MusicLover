@@ -24,7 +24,7 @@ namespace MuloApi.DataBase
         }
 
         public DbSet<ModelUser> Users { get; set; }
-        public DbSet<ModelHashUser> HashUsers { get; set; }
+        public DbSet<ModelCookieUser> HashUsers { get; set; }
 
         public AppDbContent Current
         {
