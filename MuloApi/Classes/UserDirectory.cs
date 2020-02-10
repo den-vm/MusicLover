@@ -64,7 +64,7 @@ namespace MuloApi.Classes
             {
                 var trackBytes =
                     await File.ReadAllBytesAsync(_defaultDirectoryUser + $"user_{idUser}" + $"/{idTrack}.mp3");
-                return new FileContentResult(trackBytes, "media/mpeg");
+                return new FileContentResult(trackBytes, "audio/mpeg");
             }
             catch (Exception e)
             {
