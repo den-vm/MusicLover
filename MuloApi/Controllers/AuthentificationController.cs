@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MuloApi.Classes;
@@ -39,12 +40,14 @@ namespace MuloApi.Controllers
                         var idUser = await ControlDataBase.GetUserId(dataUser.Login);
 
                         if (idUser != -1)
+                        {
                             return new JsonResult(new
                                 {
                                     user_id = idUser,
                                     login = dataUser.Login
                                 })
                                 {StatusCode = 200};
+                        }
                     }
             }
             catch (Exception e)
@@ -166,6 +169,16 @@ namespace MuloApi.Controllers
             {
                 tracks = listTracks
             });
+        }
+
+        [HttpPost]
+        [Route("/user/{idUser:min(0)}/logout")]
+        public async void LogoutUser(int idUser)
+        {
+            var hashUser = await ControlDataBase.DeleteCookieUser(idUser, Request.Cookies["session"]);
+            if (hashUser != null)
+                Response.StatusCode = 200;
+            Response.StatusCode = 500;
         }
     }
 }
