@@ -185,12 +185,10 @@ namespace MuloApi.Controllers
 
         [HttpPost]
         [Route("/logout")]
-        public async void LogoutUser()
+        public async Task<ActionResult> LogoutUser()
         {
             var hashUser = await ControlDataBase.DeleteCookieUser(Request.Cookies["session"]);
-            if (hashUser != null)
-                Response.StatusCode = 200;
-            Response.StatusCode = 500;
+            return StatusCode(hashUser != null ? 200 : 500);
         }
     }
 }
