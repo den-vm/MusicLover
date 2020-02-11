@@ -37,7 +37,7 @@ namespace MuloApi.Controllers
                                 })
                                 {StatusCode = 521};
 
-                        var idUser = await ControlDataBase.GetUserId(dataUser.Login);
+                        var idUser = await ControlDataBase.GetUserId(dataUser.Login, dataUser.Password);
 
                         if (idUser != -1)
                         {
@@ -184,10 +184,10 @@ namespace MuloApi.Controllers
         }
 
         [HttpPost]
-        [Route("/user/{idUser:min(0)}/logout")]
-        public async void LogoutUser(int idUser)
+        [Route("/logout")]
+        public async void LogoutUser()
         {
-            var hashUser = await ControlDataBase.DeleteCookieUser(idUser, Request.Cookies["session"]);
+            var hashUser = await ControlDataBase.DeleteCookieUser(Request.Cookies["session"]);
             if (hashUser != null)
                 Response.StatusCode = 200;
             Response.StatusCode = 500;

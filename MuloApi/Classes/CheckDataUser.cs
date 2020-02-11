@@ -34,12 +34,14 @@ namespace MuloApi.Classes
 
         public string GetHash(int idUser, string agent)
         {
-            var setHashCode = Md5Hash(Md5Hash(idUser + agent));
+            var rnd = new Random();
+            var randomKey = rnd.Next(10000, 100000);
+            var setHashCode = Md5Hash(Md5Hash(idUser + agent + randomKey));
             return setHashCode;
         }
 
 
-        private static string Md5Hash(string input)
+        public static string Md5Hash(string input)
         {
             var hash = new StringBuilder();
             var md5Provider = new MD5CryptoServiceProvider();

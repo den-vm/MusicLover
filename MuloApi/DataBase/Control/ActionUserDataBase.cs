@@ -25,7 +25,8 @@ namespace MuloApi.DataBase.Control
         {
             try
             {
-                var newUser = new ModelUser {Login = login, Password = password};
+                var hashPassword = CheckDataUser.Md5Hash(CheckDataUser.Md5Hash(password));
+                var newUser = new ModelUser {Login = login, Password = hashPassword};
                 await DataBase.Users.AddAsync(newUser);
                 await DataBase.SaveChangesAsync();
                 return true;
@@ -55,12 +56,15 @@ namespace MuloApi.DataBase.Control
             return false;
         }
 
-        public async Task<int> GetUserId(string login)
+        public async Task<int> GetUserId(string login, string password = "")
         {
             try
             {
                 var result = await DataBase.Users.FirstOrDefaultAsync(user => user.Login.Equals(login));
-                if (result != null) return result.Id;
+                if (result == null)
+                    return -1;
+                var passHash = CheckDataUser.Md5Hash(CheckDataUser.Md5Hash(password));
+                if (result.Password.Equals(passHash) || password.Equals("")) return result.Id;
             }
             catch (Exception e)
             {
@@ -88,13 +92,14 @@ namespace MuloApi.DataBase.Control
 
                 var newHashUser = new ModelCookieUser
                 {
-                    IdUser = idUser, 
+                    IdUser = idUser,
                     Cookie = hashUser,
                     Start = DateTime.Now,
                     End = DateTime.Now.AddHours(24)
                 };
                 await DataBase.HashUsers.AddAsync(newHashUser);
                 await DataBase.SaveChangesAsync();
+                return hashUser;
             }
             catch (Exception e)
             {
@@ -128,13 +133,12 @@ namespace MuloApi.DataBase.Control
             return null;
         }
 
-        public async Task<bool?> DeleteCookieUser(int idUser, string cookie)
+        public async Task<bool?> DeleteCookieUser(string cookie)
         {
             try
             {
                 var resultSearch =
-                    await DataBase.HashUsers.FirstOrDefaultAsync(hash =>
-                        hash.IdUser.Equals(idUser) && hash.Cookie.Equals(cookie));
+                    await DataBase.HashUsers.FirstOrDefaultAsync(hash => hash.Cookie.Equals(cookie));
                 DataBase.HashUsers.Remove(resultSearch);
                 await DataBase.SaveChangesAsync();
                 return true;
