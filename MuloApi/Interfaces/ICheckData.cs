@@ -8,6 +8,5 @@
         bool CheckLoginRegular(string login);
         bool CheckLoginSmtp(string login);
         bool CheckPasswordRegular(string password);
-        string GetHash(int idUser, string agent);
     }
 }

@@ -40,7 +40,6 @@ namespace MuloApi.Classes
             return setHashCode;
         }
 
-
         public static string Md5Hash(string input)
         {
             var hash = new StringBuilder();

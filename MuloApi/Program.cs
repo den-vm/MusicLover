@@ -1,6 +1,8 @@
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MuloApi
 {
@@ -17,6 +19,13 @@ namespace MuloApi
                 .UseKestrel()
                 .UseConfiguration(config)
                 .UseContentRoot(Directory.GetCurrentDirectory())
+                .ConfigureLogging((context, logging) =>
+                {
+                    //logging.AddConfiguration(context.Configuration.GetSection("Logging"));
+                    if (!context.HostingEnvironment.IsDevelopment()) return;
+                    logging.AddConsole();
+                    logging.AddDebug();
+                })
                 .UseStartup<Startup>()
                 .Build();
             host.Run();
