@@ -75,7 +75,8 @@ namespace MuloApi.DataBase.Control
             return -1;
         }
 
-        public async Task<string> SaveCookieUser(int idUser, IHeaderDictionary headerRequest)
+        public async Task<string> SaveCookieUser(int idUser, IHeaderDictionary headerRequest, bool updateCookie = false,
+            ModelCookieUser dataCookieUser = null)
         {
             try
             {
@@ -84,20 +85,26 @@ namespace MuloApi.DataBase.Control
                     where header.Key.Equals("User-Agent")
                     select header.Value).ToArray().LastOrDefault()[0];
                 var hashUser = checkDataUser.GetHash(idUser, agent);
-                var result =
-                    await DataBase.HashUsers.FirstOrDefaultAsync(hash =>
-                        hash.IdUser.Equals(idUser) && hash.Cookie.Equals(hashUser));
-                if (result != null)
-                    return result.Cookie;
 
-                var newHashUser = new ModelCookieUser
+                if (!updateCookie) // create new cookie
                 {
-                    IdUser = idUser,
-                    Cookie = hashUser,
-                    Start = DateTime.Now,
-                    End = DateTime.Now.AddHours(24)
-                };
-                await DataBase.HashUsers.AddAsync(newHashUser);
+                    var newHashUser = new ModelCookieUser
+                    {
+                        IdUser = idUser,
+                        Cookie = hashUser,
+                        Start = DateTime.Now,
+                        End = DateTime.Now.AddHours(24)
+                    };
+                    await DataBase.HashUsers.AddAsync(newHashUser);
+                    await DataBase.SaveChangesAsync();
+                    return hashUser;
+                }
+
+                //update expired cookies
+                dataCookieUser.Cookie = hashUser;
+                dataCookieUser.Start = DateTime.Now;
+                dataCookieUser.End = DateTime.Now.AddHours(24);
+                DataBase.HashUsers.Update(dataCookieUser);
                 await DataBase.SaveChangesAsync();
                 return hashUser;
             }
@@ -110,19 +117,15 @@ namespace MuloApi.DataBase.Control
             return null;
         }
 
-        public async Task<bool?> CheckCookieUser(string cookieUser, int idUser, IHeaderDictionary headerRequest)
+        public async Task<ModelCookieUser> GetDataCookieUser(string cookieUser)
         {
             try
             {
-                var checkDataUser = new CheckDataUser();
-                var agent = (from header in headerRequest
-                    where header.Key.Equals("User-Agent")
-                    select header.Value).ToArray().LastOrDefault()[0];
-                var hashUser = checkDataUser.GetHash(idUser, agent);
                 var result =
                     await DataBase.HashUsers.FirstOrDefaultAsync(hash =>
-                        hash.IdUser.Equals(idUser) && hash.Cookie.Equals(hashUser));
-                return result != null && result.Cookie.Equals(hashUser);
+                        hash.Cookie.Equals(cookieUser));
+                if (result != null)
+                    return result;
             }
             catch (Exception e)
             {
@@ -133,7 +136,7 @@ namespace MuloApi.DataBase.Control
             return null;
         }
 
-        public async Task<bool?> DeleteCookieUser(string cookie)
+        public async Task<bool> DeleteCookieUser(string cookie)
         {
             try
             {
@@ -149,7 +152,7 @@ namespace MuloApi.DataBase.Control
                     await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
             }
 
-            return null;
+            return false;
         }
     }
 }
