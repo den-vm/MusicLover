@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using MuloApi.Classes;
 using MuloApi.DataBase;
 using MuloApi.DataBase.Control;
 using MuloApi.DataBase.Control.Interfaces;
+using MuloApi.DataBase.Entities;
 using MuloApi.Interfaces;
 using MuloApi.Models;
 
@@ -181,6 +183,27 @@ namespace MuloApi.Controllers
             {
                 tracks = listTracks
             });
+        }
+
+        [HttpPost]
+        [Route("/user")]
+        public async Task<ActionResult> InformationUser()
+        {
+            var dataCookie = await ControlDataBase.GetDataCookieUser(Request.Cookies["session"]);
+            var serializeInfoUser = await ControlDataBase.GetDataUser(dataCookie.IdUser);
+            if (serializeInfoUser.Equals(""))
+                return new JsonResult(new
+                    {
+                        error = "ERRORSERVER"
+                    })
+                    {StatusCode = 500};
+            var deserializeJsonInfoUser = JsonSerializer.Deserialize<ModelUser>(serializeInfoUser);
+            return new JsonResult(new
+                {
+                    user_id = deserializeJsonInfoUser.Id,
+                    login = deserializeJsonInfoUser.Login
+                })
+                {StatusCode = 200};
         }
 
         [HttpPost]

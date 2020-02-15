@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -153,6 +154,28 @@ namespace MuloApi.DataBase.Control
             }
 
             return false;
+        }
+
+        public async Task<string> GetDataUser(int idUser)
+        {
+            try
+            {
+                var resultSearch =
+                    await DataBase.Users.FirstOrDefaultAsync(user => user.Id.Equals(idUser));
+                var jsonDataUser = JsonSerializer.Serialize(new ModelUser()
+                {
+                    Id = resultSearch.Id,
+                    Login = resultSearch.Login
+                });
+                return jsonDataUser;
+            }
+            catch (Exception e)
+            {
+                if (Startup.LoggerApp != null)
+                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+            }
+
+            return "";
         }
     }
 }
