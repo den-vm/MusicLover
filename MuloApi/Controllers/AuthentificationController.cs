@@ -66,9 +66,12 @@ namespace MuloApi.Controllers
 
             return new JsonResult(new
                 {
-                    errors = new
+                    errors = new[]
                     {
-                        message = "INCORRECT_PASSWORD_OR_LOGIN"
+                        new
+                        {
+                            message = "INCORRECT_PASSWORD_OR_LOGIN"
+                        }
                     }
                 })
                 {StatusCode = 401};
@@ -85,9 +88,12 @@ namespace MuloApi.Controllers
                     if (!CheckDataUser.CheckLoginRegular(dataUser.Login))
                         return new JsonResult(new
                             {
-                                errors = new
+                                errors = new[]
                                 {
-                                    message = "INCORRECT_LOGIN"
+                                    new
+                                    {
+                                        message = "INCORRECT_LOGIN"
+                                    }
                                 }
                             })
                             {StatusCode = 401};
@@ -95,9 +101,12 @@ namespace MuloApi.Controllers
                     if (!CheckDataUser.CheckPasswordRegular(dataUser.Password))
                         return new JsonResult(new
                             {
-                                errors = new
+                                errors = new[]
                                 {
-                                    message = "INCORRECT_PASSWORD"
+                                    new
+                                    {
+                                        message = "INCORRECT_PASSWORD"
+                                    }
                                 }
                             })
                             {StatusCode = 401};
@@ -113,9 +122,12 @@ namespace MuloApi.Controllers
                     if (resultExist)
                         return new JsonResult(new
                             {
-                                errors = new
+                                errors = new[]
                                 {
-                                    message = "EXISTING_USER"
+                                    new
+                                    {
+                                        message = "EXISTING_USER"
+                                    }
                                 }
                             })
                             {StatusCode = 401};
