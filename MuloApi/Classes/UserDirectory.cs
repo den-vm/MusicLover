@@ -110,8 +110,6 @@ namespace MuloApi.Classes
 
                 foreach (var track in tracksCollection)
                 {
-                    if (Startup.LoggerApp != null)
-                        await Task.Run(() => Startup.LoggerApp.LogWarning($"Type track: {track.ContentType} Size track: {track.Length}"));
                     if (!(track.FileName.Contains(".mp3") && track.Length != 0))
                         continue;
                     await Task.Run(() =>
