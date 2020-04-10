@@ -35,7 +35,7 @@ namespace MuloApi
             }
             catch (Exception e)
             {
-                LoggerApp.LogWarning(e.ToString());
+                LoggerApp.LogError(e.ToString());
             }
         }
 
@@ -49,7 +49,9 @@ namespace MuloApi
 
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
-                app.UseCors(builder => builder.WithOrigins("http://musiclover.uxp.ru")
+                var corsAddress = new[] {"http://musiclover.uxp.ru", "https://*.herokuapp.com" };
+
+                app.UseCors(builder => builder.WithOrigins(corsAddress)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials());
@@ -60,14 +62,13 @@ namespace MuloApi
                 var createConnecting = new AppDbContent().Current;
                 _ = new CheckDataUser().Current;
                 _ = new ActionUserDataBase().Current;
-
-                LoggerApp.LogWarning(createConnecting.TestConnection().Result
+                LoggerApp.LogInformation(createConnecting.TestConnection().Result
                     ? $"База данных <{createConnecting.Database.GetDbConnection().Database}> доступна"
                     : $"База данных <{createConnecting.Database.GetDbConnection().Database}> недоступна");
             }
             catch (Exception e)
             {
-                LoggerApp.LogWarning(e.ToString());
+                LoggerApp.LogError(e.ToString());
             }
         }
     }

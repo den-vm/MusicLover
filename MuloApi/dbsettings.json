@@ -1,5 +1,5 @@
 {
   "ConnectionStrings": {
-    "DefaultConnection": "server=localhost;database=muloplayer;user=mulobd;password=051291+Mulobd"
+    "DefaultConnection": "Host=ec2-54-217-204-34.eu-west-1.compute.amazonaws.com;Port=5432;Database=d7feruk3j9g4nn;Username=cgsqjcrqghalac;Password=7c9b39badc55147289b58532f1ef9669052ea470339be10402c6f40f45c4dbe5;SSL Mode=Require;Trust Server Certificate=true"
   }
 }

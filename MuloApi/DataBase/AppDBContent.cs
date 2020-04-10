@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using MuloApi.DataBase.Entities;
 using MuloApi.Interfaces;
 using Newtonsoft.Json.Linq;
+using Npgsql;
 
 namespace MuloApi.DataBase
 {
@@ -30,9 +33,9 @@ namespace MuloApi.DataBase
         {
             get
             {
-                var options = new DbContextOptionsBuilder<AppDbContent>()
-                    .UseMySQL(GetStrConnection().Result).Options;
-                return _instance ??= new AppDbContent(options);
+                var confContextOptions = new DbContextOptionsBuilder<AppDbContent>()
+                    .UseNpgsql(GetStrConnection().Result).Options;
+                return _instance ??= new AppDbContent(confContextOptions);
             }
         }
 
@@ -48,7 +51,7 @@ namespace MuloApi.DataBase
             catch (Exception e)
             {
                 if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
                 return false;
             }
         }

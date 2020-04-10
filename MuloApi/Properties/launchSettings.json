@@ -24,6 +24,12 @@
       "sqlDebugging": false,
       "nativeDebugging": false,
       "applicationUrl": "https://localhost:1441"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "publishAllPorts": true,
+      "useSSL": true
     }
   }
 }

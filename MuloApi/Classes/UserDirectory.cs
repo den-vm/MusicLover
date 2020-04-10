@@ -28,7 +28,7 @@ namespace MuloApi.Classes
             catch (Exception e)
             {
                 if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
             }
         }
 
@@ -52,7 +52,7 @@ namespace MuloApi.Classes
             catch (Exception e)
             {
                 if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
             }
 
             return null;
@@ -69,7 +69,7 @@ namespace MuloApi.Classes
             catch (Exception e)
             {
                 if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
             }
 
             return null;
@@ -85,7 +85,7 @@ namespace MuloApi.Classes
             catch (Exception e)
             {
                 if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
             }
         }
 
@@ -170,7 +170,7 @@ namespace MuloApi.Classes
             catch (Exception e)
             {
                 if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
             }
 
             return null;

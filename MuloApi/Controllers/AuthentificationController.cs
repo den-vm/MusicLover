@@ -61,7 +61,7 @@ namespace MuloApi.Controllers
             catch (Exception e)
             {
                 if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
             }
 
             return new JsonResult(new
@@ -163,7 +163,7 @@ namespace MuloApi.Controllers
             catch (Exception e)
             {
                 if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogWarning(e.ToString()));
+                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
             }
 
             return new JsonResult(new
