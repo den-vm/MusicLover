@@ -14,7 +14,7 @@ namespace MuloApi.Classes
 {
     public class UserDirectory : IActionDirectory
     {
-        private readonly string _defaultDirectoryUser = @"../ExistingUsers/";
+        private readonly string _defaultDirectoryUser = @"Existing_Users/";
         private readonly string[] _filters = {"*.mp3"};
 
         public async void CreateDirectoryUser(int idUser)

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Configuration;
 using MuloApi.Classes;
 using MuloApi.DataBase;
 using MuloApi.DataBase.Control;
@@ -44,8 +45,13 @@ namespace MuloApi
         {
             try
             {
-                loggerFactory.AddFile("../log/log_mulo_api.txt");
-                LoggerApp = loggerFactory.CreateLogger("Application");
+                loggerFactory = LoggerFactory.Create(builder =>
+                {
+                    builder.AddFile("log_app/log_mulo_api.txt");
+                    builder.AddDebug();
+                    builder.AddConsole();
+                });
+                LoggerApp = loggerFactory.CreateLogger<Startup>();
 
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 

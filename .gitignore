@@ -340,3 +340,4 @@ ASALocalRun/
 healthchecksdb
 /ExistingUsers
 /XUnitTestMuloApi
+/MuloApi/log_app/log_mulo_api-20200412.txt
