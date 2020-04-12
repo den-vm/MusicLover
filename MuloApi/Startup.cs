@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Configuration;
 using MuloApi.Classes;
 using MuloApi.DataBase;
 using MuloApi.DataBase.Control;
@@ -28,11 +27,24 @@ namespace MuloApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var corsAddress = new[] {"http://musiclover.uxp.ru", "https://*.herokuapp.com"};
             try
             {
                 services.AddControllers();
                 services.AddControllersWithViews(option => { option.Filters.Add(typeof(SingleActionFilter)); });
-                services.AddCors();
+                services.AddCors(options =>
+                {
+                    options.AddDefaultPolicy(
+                        builder =>
+                        {
+                            builder.WithOrigins(corsAddress)
+                                .SetIsOriginAllowedToAllowWildcardSubdomains()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
+                        }
+                    );
+                });
             }
             catch (Exception e)
             {
@@ -55,12 +67,8 @@ namespace MuloApi
 
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
-                var corsAddress = new[] {"http://musiclover.uxp.ru", "https://*.herokuapp.com" };
 
-                app.UseCors(builder => builder.WithOrigins(corsAddress)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials());
+                app.UseCors();
 
                 app.UseRouting();
 
