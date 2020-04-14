@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,7 @@ namespace MuloApi
             catch (Exception e)
             {
                 LoggerApp.LogError(e.ToString());
+                Task.Run(() => AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString()));
             }
         }
 
@@ -59,30 +61,27 @@ namespace MuloApi
             {
                 loggerFactory = LoggerFactory.Create(builder =>
                 {
-                    builder.AddFile("log_app/log_mulo_api.txt");
                     builder.AddDebug();
                     builder.AddConsole();
                 });
                 LoggerApp = loggerFactory.CreateLogger<Startup>();
-
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
-
-
                 app.UseCors();
-
                 app.UseRouting();
-
                 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
                 var createConnecting = new AppDbContent().Current;
                 _ = new CheckDataUser().Current;
                 _ = new ActionUserDataBase().Current;
-                LoggerApp.LogInformation(createConnecting.TestConnection().Result
-                    ? $"База данных <{createConnecting.Database.GetDbConnection().Database}> доступна"
-                    : $"База данных <{createConnecting.Database.GetDbConnection().Database}> недоступна");
+                var stateBase = createConnecting.TestConnection().Result
+                    ? $"DataBase <{createConnecting.Database.GetDbConnection().Database}> available"
+                    : $"DataBase <{createConnecting.Database.GetDbConnection().Database}> unavailable";
+                LoggerApp.LogInformation(stateBase);
+                Task.Run(() => AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Information, stateBase));
             }
             catch (Exception e)
             {
                 LoggerApp.LogError(e.ToString());
+                Task.Run(() => AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString()));
             }
         }
     }

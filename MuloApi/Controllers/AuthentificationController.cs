@@ -62,6 +62,7 @@ namespace MuloApi.Controllers
             {
                 if (Startup.LoggerApp != null)
                     await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
+                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
             }
 
             return new JsonResult(new
@@ -164,6 +165,7 @@ namespace MuloApi.Controllers
             {
                 if (Startup.LoggerApp != null)
                     await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
+                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
             }
 
             return new JsonResult(new

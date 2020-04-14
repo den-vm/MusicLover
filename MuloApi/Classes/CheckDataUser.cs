@@ -8,6 +8,9 @@ namespace MuloApi.Classes
 {
     public class CheckDataUser : ICheckData
     {
+        private const string RegEmail = @"^((\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*)\s*[;]{0,1}\s*)+$";
+        private const string RegPassword = @"^[a-zA-Z][a-zA-Z]{5}$";
+
         private static CheckDataUser _instance;
 
         public CheckDataUser Current
@@ -17,7 +20,6 @@ namespace MuloApi.Classes
 
         public bool CheckLoginRegular(string login)
         {
-            var RegEmail = @"^((\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*)\s*[;]{0,1}\s*)+$";
             return Regex.IsMatch(login, RegEmail, RegexOptions.IgnoreCase);
         }
 
@@ -28,7 +30,6 @@ namespace MuloApi.Classes
 
         public bool CheckPasswordRegular(string pass)
         {
-            var RegPassword = @"^[a-zA-Z][a-zA-Z]{5}$";
             return Regex.IsMatch(pass, RegPassword, RegexOptions.IgnoreCase);
         }
 

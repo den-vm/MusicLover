@@ -29,6 +29,7 @@ namespace MuloApi.Classes
             {
                 if (Startup.LoggerApp != null)
                     await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
+                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
             }
         }
 
@@ -53,6 +54,7 @@ namespace MuloApi.Classes
             {
                 if (Startup.LoggerApp != null)
                     await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
+                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
             }
 
             return null;
@@ -70,6 +72,7 @@ namespace MuloApi.Classes
             {
                 if (Startup.LoggerApp != null)
                     await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
+                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
             }
 
             return null;
@@ -86,6 +89,7 @@ namespace MuloApi.Classes
             {
                 if (Startup.LoggerApp != null)
                     await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
+                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
             }
         }
 
@@ -171,6 +175,7 @@ namespace MuloApi.Classes
             {
                 if (Startup.LoggerApp != null)
                     await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
+                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
             }
 
             return null;

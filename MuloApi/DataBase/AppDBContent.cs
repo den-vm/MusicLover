@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
+using MuloApi.Classes;
 using MuloApi.DataBase.Entities;
 using MuloApi.Interfaces;
 using Newtonsoft.Json.Linq;
@@ -52,6 +53,7 @@ namespace MuloApi.DataBase
             {
                 if (Startup.LoggerApp != null)
                     await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
+                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
                 return false;
             }
         }
