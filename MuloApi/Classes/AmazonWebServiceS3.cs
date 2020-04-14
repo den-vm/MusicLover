@@ -11,9 +11,12 @@ using Newtonsoft.Json.Linq;
 
 namespace MuloApi.Classes
 {
-    public class AmazonWebServiceS3 : IControlSaveLogs, IControlSaveUserFiles
+    internal class AmazonWebServiceS3 : IAmazonWebServiceS3, IControlSaveLogs
     {
         private static AmazonWebServiceS3 _instance;
+        private readonly AmazonS3Client _clientAws = new AmazonS3Client("AKIAJ5ASHTQ3JPIGMOKA",
+            "tkLM5m0sLLwCPyGTssOmfJfl94GikINyN0QDPIUA",
+            RegionEndpoint.EUNorth1);
 
         private readonly IAmazonS3 _clientAws;
 
@@ -32,16 +35,6 @@ namespace MuloApi.Classes
             get { return _instance ??= new AmazonWebServiceS3(); }
         }
 
-        public Task DownloadFileAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UploadFileAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task UploadLogAsync(TypesMessageLog typeMessage, string message)
         {
             var filename = typeMessage + "_" +
@@ -58,6 +51,11 @@ namespace MuloApi.Classes
 
             var fileTransferUtility = new TransferUtility(_clientAws);
             await fileTransferUtility.UploadAsync(uploadRequest);
+        }
+
+        public bool GetDirectoryInfo(string directory)
+        {
+            throw new NotImplementedException();
         }
     }
 }
