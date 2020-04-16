@@ -16,7 +16,7 @@ namespace MuloApi
 {
     public class Startup
     {
-        public static ILogger LoggerApp;
+        public static ILogger Logger;
 
         public Startup(IConfiguration configuration, IHostEnvironment host)
         {
@@ -49,8 +49,7 @@ namespace MuloApi
             }
             catch (Exception e)
             {
-                LoggerApp.LogError(e.ToString());
-                Task.Run(() => AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString()));
+                LoggerApp.Log.LogException(e);
             }
         }
 
@@ -64,7 +63,7 @@ namespace MuloApi
                     builder.AddDebug();
                     builder.AddConsole();
                 });
-                LoggerApp = loggerFactory.CreateLogger<Startup>();
+                Logger = loggerFactory.CreateLogger<Startup>();
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
                 app.UseCors();
                 app.UseRouting();
@@ -75,13 +74,11 @@ namespace MuloApi
                 var stateBase = createConnecting.TestConnection().Result
                     ? $"DataBase <{createConnecting.Database.GetDbConnection().Database}> available"
                     : $"DataBase <{createConnecting.Database.GetDbConnection().Database}> unavailable";
-                LoggerApp.LogInformation(stateBase);
-                Task.Run(() => AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Information, stateBase));
+                LoggerApp.Log.LogInformation(stateBase);
             }
             catch (Exception e)
             {
-                LoggerApp.LogError(e.ToString());
-                Task.Run(() => AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString()));
+                LoggerApp.Log.LogException(e);
             }
         }
     }

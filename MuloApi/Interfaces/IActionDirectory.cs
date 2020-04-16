@@ -9,7 +9,7 @@ namespace MuloApi.Interfaces
     internal interface IActionDirectory
     {
         void CreateDirectoryUser(int idUser);
-        Task<ModelUserTracks[]> GetRootTracksUser(int idUser);
+        Task<ModelUserTracks[]> GetTracksUser(int idUser);
         Task<List<ModelUserTracks>> SavedRootTrackUser(int idUser, IFormFileCollection tracksCollection);
         Task<FileResult> GetActiveTrackUser(int idUser, int idTrack);
         void DeleteDirectoryUser(int idUser);

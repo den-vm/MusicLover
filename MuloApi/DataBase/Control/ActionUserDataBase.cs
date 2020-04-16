@@ -34,9 +34,7 @@ namespace MuloApi.DataBase.Control
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return false;
@@ -51,9 +49,7 @@ namespace MuloApi.DataBase.Control
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return false;
@@ -71,9 +67,7 @@ namespace MuloApi.DataBase.Control
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return -1;
@@ -114,9 +108,7 @@ namespace MuloApi.DataBase.Control
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return null;
@@ -134,9 +126,7 @@ namespace MuloApi.DataBase.Control
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return null;
@@ -154,9 +144,7 @@ namespace MuloApi.DataBase.Control
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString())); 
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return false;
@@ -177,9 +165,7 @@ namespace MuloApi.DataBase.Control
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return "";

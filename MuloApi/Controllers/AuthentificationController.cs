@@ -60,9 +60,7 @@ namespace MuloApi.Controllers
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return new JsonResult(new
@@ -163,9 +161,7 @@ namespace MuloApi.Controllers
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return new JsonResult(new
@@ -180,7 +176,7 @@ namespace MuloApi.Controllers
         public async Task<ActionResult> GetSoundTracksUser(int idUser)
         {
             IActionDirectory userDirectory = new UserDirectory();
-            var listTracks = await userDirectory.GetRootTracksUser(idUser);
+            var listTracks = await userDirectory.GetTracksUser(idUser);
             if (listTracks == null)
                 return new JsonResult(new
                     {

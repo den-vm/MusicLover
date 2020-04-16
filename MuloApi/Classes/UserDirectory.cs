@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using MuloApi.Interfaces;
 using MuloApi.Models;
 using MusicFile = TagLib.File;
@@ -14,32 +13,36 @@ namespace MuloApi.Classes
 {
     public class UserDirectory : IActionDirectory
     {
-        private readonly string _defaultDirectoryUser = @"Existing_Users/";
+        private readonly string _defaultDirectoryUser = @"ExistingUsers/";
+        private readonly IControlDirectoryApp _directoryApp = AmazonWebServiceS3.Current;
         private readonly string[] _filters = {"*.mp3"};
 
         public async void CreateDirectoryUser(int idUser)
         {
             try
             {
-                var dirInfo = new DirectoryInfo(_defaultDirectoryUser);
-                if (!dirInfo.Exists) dirInfo.Create();
-                dirInfo.CreateSubdirectory($"user_{idUser}");
+                var dirInfo = await _directoryApp.IsCreatedDirectory(_defaultDirectoryUser, $"user_{idUser}/");
+                if (!dirInfo)
+                    throw new DirectoryNotFoundException("Error creating or reading a user folder!");
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
         }
 
-        public async Task<ModelUserTracks[]> GetRootTracksUser(int idUser)
+
+        ///Рефакторинг
+        public async Task<ModelUserTracks[]> GetTracksUser(int idUser)
         {
             try
             {
-                var mp3List =
-                    await ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters);
-                var tracksUser = await Task.Run(() => (from track in mp3List
+                var traksList =
+                    await _directoryApp.GetStreamTraks(_defaultDirectoryUser +
+                                                       $"user_{idUser}/");
+                var tempFile = traksList.Select(e => new AudioFile(new DataAudioFile("tempFile.mp3", e)));
+
+                var tracksUser = await Task.Run(() => (from track in tempFile
                     select MusicFile.Create(track)
                     into tagsTrack
                     let idTrack = int.Parse(tagsTrack.Name.Split($"user_{idUser}")[1]
@@ -52,9 +55,7 @@ namespace MuloApi.Classes
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return null;
@@ -70,9 +71,7 @@ namespace MuloApi.Classes
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
             return null;
@@ -87,98 +86,97 @@ namespace MuloApi.Classes
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
         }
 
+        ///Рефакторинг
         public async Task<List<ModelUserTracks>> SavedRootTrackUser(int idUser, IFormFileCollection tracksCollection)
         {
             try
             {
-                var mp3List =
-                    await ExtensionDirectoryGetFiles.GetFiles(_defaultDirectoryUser + $"user_{idUser}", _filters);
+                var traksList =
+                    await _directoryApp.GetNameTraks(_defaultDirectoryUser +
+                                                     $"user_{idUser}/");
 
-                var mp3ListId = await Task.Run(() => (from track in mp3List
-                    select MusicFile.Create(track)
+                var arrayIdTraks = await Task.Run(() => (from track in traksList
+                    select track
                     into tagsTrack
-                    let idTrack = int.Parse(tagsTrack.Name.Split($"user_{idUser}")[1]
+                    let idTrack = int.Parse(tagsTrack.Split($"ExistingUsers/user_{idUser}")[1]
                         .Split(".")[0]
                         .Substring(1))
                     select idTrack).ToArray());
 
-                var mp3NewId = mp3ListId.Length > 0 ? mp3ListId.Max() + 1 : 0;
-
-                var tracksSaved = new List<ModelUserTracks>();
+                var newIdTrack = arrayIdTraks.Length > 0 ? arrayIdTraks.Max() + 1 : 0;
+                var uploadTrackList = new List<ModelUserTracks>();
 
                 foreach (var track in tracksCollection)
                 {
                     if (!(track.FileName.Contains(".mp3") && track.Length != 0))
                         continue;
-                    await Task.Run(() =>
+
+                    var newStreamFormFile = new MemoryStream();
+                    track.OpenReadStream().CopyTo(newStreamFormFile);
+
+                    var tempFile =
+                        new AudioFile(new DataAudioFile(_defaultDirectoryUser + $"user_{idUser}/{newIdTrack}.mp3",
+                            newStreamFormFile));
+                    var tagsAudioFile = MusicFile.Create(tempFile);
+
+                    var removeTrackMp3 = track.FileName.Remove(track.FileName.Length - 4);
+                    var splitFileName = removeTrackMp3.Split("-");
+
+                    string newPerformance = "", newTitle = "";
+
+                    if (splitFileName.Length == 2) // Title from track.FileName
                     {
-                        using (var fileStream = new FileStream(
-                            _defaultDirectoryUser + $"user_{idUser}" + $"/{mp3NewId}.mp3", FileMode.Create))
-                        {
-                            track.CopyTo(fileStream);
-                        }
+                        newPerformance = splitFileName[0]?.Trim(' ') ?? "";
+                        newTitle = splitFileName[1]?.Trim(' ') ?? "";
+                    }
 
-                        var tagTrackSaved =
-                            MusicFile.Create(_defaultDirectoryUser + $"user_{idUser}" + $"/{mp3NewId}.mp3");
+                    var newTagTrack = new
+                    {
+                        Performance = newPerformance,
+                        Title = newTitle
+                    }; // Tags track from track.FileName
 
-                        var removeTrackMp3 = track.FileName.Remove(track.FileName.Length - 4);
-                        var splitFileName = removeTrackMp3.Split("-");
+                    if (tagsAudioFile.Tag.JoinedPerformers.Equals(""))
+                        tagsAudioFile.Tag.Performers = newTagTrack.Performance.Equals("")
+                            ? new[] {"Неизвестный исполнитель"}
+                            : new[] {newTagTrack.Performance};
 
-                        string newPerformance = "", newTitle = "";
+                    if (tagsAudioFile.Tag.Title == null)
+                        tagsAudioFile.Tag.Title = newTagTrack.Title.Equals("")
+                            ? track.FileName.Remove(track.FileName.Length - 4)
+                            : newTagTrack.Title;
 
-                        if (splitFileName.Length == 2) // Title from track.FileName
-                        {
-                            newPerformance = splitFileName[0]?.Trim(' ') ?? "";
-                            newTitle = splitFileName[1]?.Trim(' ') ?? "";
-                        }
+                    tagsAudioFile.Save();
 
-                        var newTagTrack = new
-                        {
-                            Performance = newPerformance,
-                            Title = newTitle
-                        }; // Tags track from track.FileName
+                    var nameTrack =
+                        string.Concat(tagsAudioFile.Tag.JoinedPerformers, " - ", tagsAudioFile.Tag.Title);
 
-                        if (tagTrackSaved.Tag.JoinedPerformers.Equals(""))
-                            tagTrackSaved.Tag.Performers = newTagTrack.Performance.Equals("")
-                                ? new[] {"Неизвестный исполнитель"}
-                                : new[] {newTagTrack.Performance};
-
-                        if (tagTrackSaved.Tag.Title == null)
-                            tagTrackSaved.Tag.Title = newTagTrack.Title.Equals("")
-                                ? track.FileName.Remove(track.FileName.Length - 4)
-                                : newTagTrack.Title;
-
-                        tagTrackSaved.Save();
-
-                        var nameTracks =
-                            string.Concat(tagTrackSaved.Tag.JoinedPerformers, " - ", tagTrackSaved.Tag.Title);
-
-                        tracksSaved.Add(new ModelUserTracks
-                        {
-                            Id = mp3NewId,
-                            Name = nameTracks
-                        });
-
-                        mp3NewId++;
+                    uploadTrackList.Add(new ModelUserTracks
+                    {
+                        Id = newIdTrack,
+                        Name = nameTrack
                     });
+
+                    await _directoryApp.UploadFile(_defaultDirectoryUser + $"user_{idUser}/{newIdTrack}.mp3",
+                        newStreamFormFile);
+
+                    newStreamFormFile.Close();
+
+                    newIdTrack++;
                 }
 
-                return tracksSaved;
+                return uploadTrackList;
             }
             catch (Exception e)
             {
-                if (Startup.LoggerApp != null)
-                    await Task.Run(() => Startup.LoggerApp.LogError(e.ToString()));
-                await AmazonWebServiceS3.Current.UploadLogAsync(TypesMessageLog.Error, e.ToString());
+                LoggerApp.Log.LogException(e);
             }
 
-            return null;
+            return new List<ModelUserTracks>();
         }
     }
 }
