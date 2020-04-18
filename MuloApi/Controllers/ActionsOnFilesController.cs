@@ -18,7 +18,8 @@ namespace MuloApi.Controllers
         public async Task<ActionResult> UploadSoundTrack(int idUser, IFormFileCollection tracks)
         {
             IActionDirectory userDirectory = new UserDirectory();
-            var downloadedTrack = await userDirectory.SavedRootTrackUser(idUser, tracks);
+            var idCatalog = -1;
+            var downloadedTrack = await userDirectory.SavedTracksUser(idUser, idCatalog, tracks);
             if (downloadedTrack == null || downloadedTrack.Count == 0)
                 return new JsonResult(new
                     {
@@ -36,7 +37,8 @@ namespace MuloApi.Controllers
         public async Task<ActionResult> PlaySoundTrack(int idUser, int idTrack)
         {
             IActionDirectory userDirectory = new UserDirectory();
-            var trackBinary = await userDirectory.GetActiveTrackUser(idUser, idTrack);
+            var idCatalog = -1;
+            var trackBinary = await userDirectory.GetActiveTrackUser(idUser, idCatalog, idTrack);
             if (trackBinary == null)
                 return new JsonResult(new
                     {

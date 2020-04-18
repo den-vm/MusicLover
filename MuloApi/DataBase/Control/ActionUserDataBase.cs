@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using MuloApi.Classes;
 using MuloApi.DataBase.Control.Interfaces;
 using MuloApi.DataBase.Entities;
+using MuloApi.Models;
 
 namespace MuloApi.DataBase.Control
 {
@@ -150,13 +151,58 @@ namespace MuloApi.DataBase.Control
             return false;
         }
 
+        public async Task<bool> CreateCatalog(int idUser, string path)
+        {
+            try
+            {
+                var newCatalog = new ModelCatalog {IdUser = idUser, Path = path};
+                await DataBase.Catalogs.AddAsync(newCatalog);
+                await DataBase.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+            }
+
+            return false;
+        }
+
+        public async Task AddTrackLoaded<T>(int idUser, string path, T tracks)
+        {
+            try
+            {
+                if (tracks is List<ModelUserTracks> listTracks)
+                {
+                    var catalog =
+                        await DataBase.Catalogs.FirstOrDefaultAsync(e =>
+                            e.IdUser.Equals(idUser) && e.Path.Equals(path));
+                    var userTracks = listTracks.Select(track => new ModelMusicTracks
+                        {
+                            IdUser = catalog.IdUser,
+                            IdCatalog = catalog.Id,
+                            IdTrack = track.Id,
+                            NameTrack = track.Name,
+                            DateLoadTrack = DateTime.Parse(track.DateLoad)
+                        })
+                        .ToList();
+                    await DataBase.MusicTracks.AddRangeAsync(userTracks);
+                    await DataBase.SaveChangesAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+            }
+        }
+
         public async Task<string> GetDataUser(int idUser)
         {
             try
             {
                 var resultSearch =
                     await DataBase.Users.FirstOrDefaultAsync(user => user.Id.Equals(idUser));
-                var jsonDataUser = JsonSerializer.Serialize(new ModelUser()
+                var jsonDataUser = JsonSerializer.Serialize(new ModelUser
                 {
                     Id = resultSearch.Id,
                     Login = resultSearch.Login
@@ -169,6 +215,53 @@ namespace MuloApi.DataBase.Control
             }
 
             return "";
+        }
+
+        public async Task<ModelUserTracks[]> GetTracksUser(int idUser, int idCatalog)
+        {
+            try
+            {
+                if (idCatalog == -1)
+                    idCatalog = (await DataBase.Catalogs.FirstOrDefaultAsync(catalog => catalog.IdUser.Equals(idUser)))
+                        .Id;
+
+                var result = await Task.Run(() =>
+                {
+                    return DataBase.MusicTracks.Where(track =>
+                        track.IdUser.Equals(idUser) && track.IdCatalog.Equals(idCatalog)).ToList();
+                });
+                var listTrack = result.Select(track => new ModelUserTracks
+                {
+                    Id = track.IdTrack,
+                    Name = track.NameTrack,
+                    DateLoad = track.DateLoadTrack.ToString("dd.MM.yyyy hh:mm:ss")
+                }).ToArray();
+
+                return listTrack;
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+            }
+
+            return null;
+        }
+
+        public async Task<string> GetPathCatalog(int idUser, int idCatalog)
+        {
+            try
+            {
+                return idCatalog == -1
+                    ? (await DataBase.Catalogs.FirstOrDefaultAsync(catalog => catalog.IdUser.Equals(idUser))).Path
+                    : (await DataBase.Catalogs.FirstOrDefaultAsync(catalog =>
+                        catalog.IdUser.Equals(idUser) && catalog.Id.Equals(idCatalog))).Path;
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+            }
+
+            return null;
         }
     }
 }

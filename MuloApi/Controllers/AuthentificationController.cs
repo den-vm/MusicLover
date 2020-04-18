@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using MuloApi.Classes;
 using MuloApi.DataBase;
 using MuloApi.DataBase.Control;
@@ -143,7 +142,7 @@ namespace MuloApi.Controllers
                     if (idUser != -1)
                     {
                         IActionDirectory addDirectoryUser = new UserDirectory();
-                        addDirectoryUser.CreateDirectoryUser(idUser);
+                        await addDirectoryUser.CreateDirectoryUser(idUser);
                         var hashUser = await ControlDataBase.SaveCookieUser(idUser, Request.Headers);
                         var newSettingCookie = new CookieOptions
                         {
@@ -176,7 +175,8 @@ namespace MuloApi.Controllers
         public async Task<ActionResult> GetSoundTracksUser(int idUser)
         {
             IActionDirectory userDirectory = new UserDirectory();
-            var listTracks = await userDirectory.GetTracksUser(idUser);
+            var idCatalog = -1;
+            var listTracks = await userDirectory.GetTracksUser(idUser, idCatalog);
             if (listTracks == null)
                 return new JsonResult(new
                     {

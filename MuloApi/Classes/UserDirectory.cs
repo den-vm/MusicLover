@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MuloApi.DataBase.Control;
 using MuloApi.Interfaces;
 using MuloApi.Models;
 using MusicFile = TagLib.File;
@@ -16,14 +17,18 @@ namespace MuloApi.Classes
         private readonly string _defaultDirectoryUser = @"ExistingUsers/";
         private readonly IControlDirectoryApp _directoryApp = AmazonWebServiceS3.Current;
         private readonly string[] _filters = {"*.mp3"};
+        private readonly string catalogMusic = "/";
 
-        public async void CreateDirectoryUser(int idUser)
+        public async Task CreateDirectoryUser(int idUser, string catalog = "/")
         {
             try
             {
-                var dirInfo = await _directoryApp.IsCreatedDirectory(_defaultDirectoryUser, $"user_{idUser}/");
+                var dirInfo = await _directoryApp.IsCreatedDirectory(_defaultDirectoryUser, $"user_{idUser}{catalog}");
                 if (!dirInfo)
-                    throw new DirectoryNotFoundException("Error creating or reading a user folder!");
+                    throw new DirectoryNotFoundException("Error creating a user folder");
+                var isCreatedCatalog = await new ActionUserDataBase().Current.CreateCatalog(idUser, catalog);
+                if (!isCreatedCatalog)
+                    throw new DirectoryNotFoundException("Error saving the user's folder to the database");
             }
             catch (Exception e)
             {
@@ -32,25 +37,13 @@ namespace MuloApi.Classes
         }
 
 
-        ///Рефакторинг
-        public async Task<ModelUserTracks[]> GetTracksUser(int idUser)
+        public async Task<ModelUserTracks[]> GetTracksUser(int idUser, int idCatalog)
         {
             try
             {
-                var traksList =
-                    await _directoryApp.GetStreamTraks(_defaultDirectoryUser +
-                                                       $"user_{idUser}/");
-                var tempFile = traksList.Select(e => new AudioFile(new DataAudioFile("tempFile.mp3", e)));
-
-                var tracksUser = await Task.Run(() => (from track in tempFile
-                    select MusicFile.Create(track)
-                    into tagsTrack
-                    let idTrack = int.Parse(tagsTrack.Name.Split($"user_{idUser}")[1]
-                        .Split(".")[0]
-                        .Substring(1))
-                    let nameTrack =
-                        string.Concat(tagsTrack.Tag.JoinedPerformers, " - ", tagsTrack.Tag.Title)
-                    select new ModelUserTracks {Id = idTrack, Name = nameTrack}).ToArray());
+                var tracksUser = await new ActionUserDataBase().Current.GetTracksUser(idUser, idCatalog);
+                if (tracksUser == null)
+                    throw new Exception("Error in executing the request to output the track list");
                 return tracksUser;
             }
             catch (Exception e)
@@ -61,13 +54,16 @@ namespace MuloApi.Classes
             return null;
         }
 
-        public async Task<FileResult> GetActiveTrackUser(int idUser, int idTrack)
+        public async Task<FileResult> GetActiveTrackUser(int idUser, int idCatalog, int idTrack)
         {
             try
             {
-                var trackBytes =
-                    await File.ReadAllBytesAsync(_defaultDirectoryUser + $"user_{idUser}" + $"/{idTrack}.mp3");
-                return new FileContentResult(trackBytes, "audio/mpeg");
+                var pathCatalog = await new ActionUserDataBase().Current.GetPathCatalog(idUser, idCatalog);
+                if (pathCatalog == null)
+                    throw new Exception("Error in executing the request to output the track list");
+                var fullPathTrack = $"{_defaultDirectoryUser}user_{idUser}{pathCatalog}{idTrack}.mp3";
+                var trackStream = await _directoryApp.GetFile(fullPathTrack);
+                return new FileContentResult(trackStream.ToArray(), "audio/mpeg");
             }
             catch (Exception e)
             {
@@ -77,12 +73,11 @@ namespace MuloApi.Classes
             return null;
         }
 
-        public async void DeleteDirectoryUser(int idUser)
+        public async Task DeleteDirectoryUser(int idUser, int idCatalog)
         {
             try
             {
-                var dirUser = new DirectoryInfo(_defaultDirectoryUser) + $"user_{idUser}";
-                Directory.Delete(dirUser);
+                throw new Exception("Undefined method 'Delete directory'");
             }
             catch (Exception e)
             {
@@ -90,24 +85,17 @@ namespace MuloApi.Classes
             }
         }
 
-        ///Рефакторинг
-        public async Task<List<ModelUserTracks>> SavedRootTrackUser(int idUser, IFormFileCollection tracksCollection)
+        public async Task<List<ModelUserTracks>> SavedTracksUser(int idUser, int idCatalog,
+            IFormFileCollection tracksCollection)
         {
             try
             {
-                var traksList =
-                    await _directoryApp.GetNameTraks(_defaultDirectoryUser +
-                                                     $"user_{idUser}/");
+                var tracksUser = await new ActionUserDataBase().Current.GetTracksUser(idUser, idCatalog);
+                if (tracksUser == null)
+                    throw new Exception("Error in executing the request to output the track list");
 
-                var arrayIdTraks = await Task.Run(() => (from track in traksList
-                    select track
-                    into tagsTrack
-                    let idTrack = int.Parse(tagsTrack.Split($"ExistingUsers/user_{idUser}")[1]
-                        .Split(".")[0]
-                        .Substring(1))
-                    select idTrack).ToArray());
+                var newIdTrack = tracksUser.Length > 0 ? tracksUser.Select(track => track.Id).Max() + 1 : 1;
 
-                var newIdTrack = arrayIdTraks.Length > 0 ? arrayIdTraks.Max() + 1 : 0;
                 var uploadTrackList = new List<ModelUserTracks>();
 
                 foreach (var track in tracksCollection)
@@ -124,7 +112,7 @@ namespace MuloApi.Classes
                     var tagsAudioFile = MusicFile.Create(tempFile);
 
                     var removeTrackMp3 = track.FileName.Remove(track.FileName.Length - 4);
-                    var splitFileName = removeTrackMp3.Split("-");
+                    var splitFileName = removeTrackMp3.Split('-', '–');
 
                     string newPerformance = "", newTitle = "";
 
@@ -158,16 +146,20 @@ namespace MuloApi.Classes
                     uploadTrackList.Add(new ModelUserTracks
                     {
                         Id = newIdTrack,
-                        Name = nameTrack
+                        Name = nameTrack,
+                        DateLoad = DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss")
                     });
 
-                    await _directoryApp.UploadFile(_defaultDirectoryUser + $"user_{idUser}/{newIdTrack}.mp3",
+                    await _directoryApp.UploadFile(
+                        _defaultDirectoryUser + $"user_{idUser}{catalogMusic}{newIdTrack}.mp3",
                         newStreamFormFile);
 
                     newStreamFormFile.Close();
 
                     newIdTrack++;
                 }
+
+                await new ActionUserDataBase().Current.AddTrackLoaded(idUser, $"{catalogMusic}", uploadTrackList);
 
                 return uploadTrackList;
             }

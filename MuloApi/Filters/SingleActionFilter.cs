@@ -19,7 +19,7 @@ namespace MuloApi.Filters
                 var dbUserCookie = await new ActionUserDataBase().Current.GetDataCookieUser(cookieUser);
                 if (dbUserCookie != null) // есть куки в базе данных
                 {
-                    if (dbUserCookie.End < DateTime.Now) //если срок действия куки истёк и не вышел из аккаунта
+                    if (dbUserCookie.End < DateTime.Now) //если срок действия куки истёк
                     {
                         var newCookie = await new ActionUserDataBase().Current.SaveCookieUser(dbUserCookie.IdUser,
                             context.HttpContext.Request.Headers, true, dbUserCookie);
@@ -30,8 +30,8 @@ namespace MuloApi.Filters
                         context.HttpContext.Response.Cookies.Append("session", newCookie, newSettingCookie);
                     }
 
-                    if (routeData[0].ToString().Equals("ConnectUser")
-                    ) // если пытается авторизироваться то возвращаем idUser по действительному куки
+                    if (routeData[0].ToString().Equals("ConnectUser") || routeData[0].ToString().Equals("CreateUser"))
+                    // если пытается авторизироваться или зарегистрироваться то возвращаем idUser по действительному куки
                     {
                         context.Result = new JsonResult(new
                             {

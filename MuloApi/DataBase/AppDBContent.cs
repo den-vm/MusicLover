@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Logging;
 using MuloApi.Classes;
 using MuloApi.DataBase.Entities;
 using MuloApi.Interfaces;
 using Newtonsoft.Json.Linq;
-using Npgsql;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
 namespace MuloApi.DataBase
 {
@@ -29,6 +26,8 @@ namespace MuloApi.DataBase
 
         public DbSet<ModelUser> Users { get; set; }
         public DbSet<ModelCookieUser> HashUsers { get; set; }
+        public DbSet<ModelCatalog> Catalogs { get; set; }
+        public DbSet<ModelMusicTracks> MusicTracks { get; set; }
 
         public AppDbContent Current
         {

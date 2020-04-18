@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon;
@@ -40,34 +38,12 @@ namespace MuloApi.Classes
             get { return _instance ??= new AmazonWebServiceS3(); }
         }
 
-        ///Рефакторинг
-        public async Task<IEnumerable<Stream>> GetStreamTraks(string directory)
+        public async Task<MemoryStream> GetFile(string directory)
         {
-            var nameTracks = await GetNameTraks(directory);
-            var listStreamFile = new List<Stream>();
-            foreach (var name in nameTracks)
-            {
-                var response = await _clientAws.GetObjectAsync(_bucketName, name);
-                var newStreamFormFile = new MemoryStream();
-                await response.ResponseStream.CopyToAsync(newStreamFormFile);
-                listStreamFile.Add(newStreamFormFile);
-            }
-            return listStreamFile;
-        }
-
-        ///Рефакторинг
-        public async Task<IEnumerable<string>> GetNameTraks(string directory)
-        {
-            var request = new ListObjectsRequest
-            {
-                BucketName = _bucketName,
-                Prefix = directory
-            };
-
-            var response = await _clientAws.ListObjectsAsync(request);
-            var traks = response.S3Objects.Where(e => e.Key.Contains(".mp3"))
-                .Select(e => e.Key).ToList();
-            return traks;
+            var response = await _clientAws.GetObjectAsync(_bucketName, directory);
+            var newStreamFormFile = new MemoryStream();
+            await response.ResponseStream.CopyToAsync(newStreamFormFile);
+            return newStreamFormFile;
         }
 
         public async Task<bool> IsCreatedDirectory(string directory, string userCatalog)
@@ -102,7 +78,7 @@ namespace MuloApi.Classes
         {
             try
             {
-                var request = new PutObjectRequest()
+                var request = new PutObjectRequest
                 {
                     InputStream = inputStream,
                     BucketName = _bucketName,
@@ -115,6 +91,7 @@ namespace MuloApi.Classes
                 LoggerApp.Log.LogException(e);
                 return false;
             }
+
             return true;
         }
 
