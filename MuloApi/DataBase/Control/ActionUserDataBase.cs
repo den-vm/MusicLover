@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -82,7 +83,7 @@ namespace MuloApi.DataBase.Control
                 var checkDataUser = new CheckDataUser();
                 var agent = (from header in headerRequest
                     where header.Key.Equals("User-Agent")
-                    select header.Value).ToArray().LastOrDefault()[0];
+                    select header.Value).ToArray().LastOrDefault();
                 var hashUser = checkDataUser.GetHash(idUser, agent);
 
                 if (!updateCookie) // create new cookie
@@ -183,8 +184,9 @@ namespace MuloApi.DataBase.Control
                             IdCatalog = catalog.Id,
                             IdTrack = track.Id,
                             NameTrack = track.Name,
-                            DateLoadTrack = DateTime.Parse(track.DateLoad)
-                        })
+                            DateLoadTrack = DateTime.ParseExact(track.DateLoad, "dd.MM.yyyy hh:mm:ss", CultureInfo.InvariantCulture)
+
+                })
                         .ToList();
                     await DataBase.MusicTracks.AddRangeAsync(userTracks);
                     await DataBase.SaveChangesAsync();
