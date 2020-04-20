@@ -28,22 +28,19 @@ namespace MuloApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var corsAddress = new[] {"http://musiclover.uxp.ru", "https://*.herokuapp.com"};
             try
             {
                 services.AddControllers();
                 services.AddControllersWithViews(option => { option.Filters.Add(typeof(SingleActionFilter)); });
                 services.AddCors(options =>
                 {
-                    options.AddDefaultPolicy(
-                        builder =>
-                        {
-                            builder.WithOrigins(corsAddress)
-                                .SetIsOriginAllowedToAllowWildcardSubdomains()
-                                .AllowAnyHeader()
-                                .AllowAnyMethod()
-                                .AllowCredentials();
-                        }
+                    options.AddPolicy("herokuapp",
+                        builder => builder
+                            .SetIsOriginAllowedToAllowWildcardSubdomains()
+                            .WithOrigins("https://*.herokuapp.com")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials()
                     );
                 });
             }
@@ -65,7 +62,7 @@ namespace MuloApi
                 });
                 Logger = loggerFactory.CreateLogger<Startup>();
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
-                app.UseCors();
+                app.UseCors("herokuapp");
                 app.UseRouting();
                 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
                 var createConnecting = new AppDbContent().Current;
