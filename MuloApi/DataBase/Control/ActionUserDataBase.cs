@@ -184,7 +184,7 @@ namespace MuloApi.DataBase.Control
                             IdCatalog = catalog.Id,
                             IdTrack = track.Id,
                             NameTrack = track.Name,
-                            DateLoadTrack = DateTime.ParseExact(track.DateLoad, "dd.MM.yyyy hh:mm:ss", CultureInfo.InvariantCulture)
+                            DateLoadTrack = DateTime.ParseExact(track.DateLoad, "O", CultureInfo.CurrentCulture)
 
                 })
                         .ToList();
@@ -236,7 +236,7 @@ namespace MuloApi.DataBase.Control
                 {
                     Id = track.IdTrack,
                     Name = track.NameTrack,
-                    DateLoad = track.DateLoadTrack.ToString("O") // datetime format ISO 8601
+                    DateLoad = track.DateLoadTrack.ToString("O") 
                 }).ToArray();
 
                 return listTrack;
