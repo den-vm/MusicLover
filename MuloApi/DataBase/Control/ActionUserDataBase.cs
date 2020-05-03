@@ -236,7 +236,7 @@ namespace MuloApi.DataBase.Control
                 {
                     Id = track.IdTrack,
                     Name = track.NameTrack,
-                    DateLoad = track.DateLoadTrack.ToString("dd.MM.yyyy hh:mm:ss")
+                    DateLoad = track.DateLoadTrack.ToString("O") // datetime format ISO 8601
                 }).ToArray();
 
                 return listTrack;

@@ -147,7 +147,7 @@ namespace MuloApi.Classes
                     {
                         Id = newIdTrack,
                         Name = nameTrack,
-                        DateLoad = DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss")
+                        DateLoad = DateTime.Now.ToString("O") // datetime format ISO 8601
                     });
 
                     await _directoryApp.UploadFile(
