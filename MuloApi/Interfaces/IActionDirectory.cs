@@ -13,5 +13,6 @@ namespace MuloApi.Interfaces
         Task<List<ModelUserTracks>> SavedTracksUser(int idUser, int idCatalog, IFormFileCollection tracksCollection);
         Task<FileResult> GetActiveTrackUser(int idUser, int idCatalog, int idTrack);
         Task DeleteDirectoryUser(int idUser, int idCatalog);
+        Task<string> DeleteTrackUser(int idUser, int idCatalog, int idTrack);
     }
 }

@@ -13,5 +13,6 @@ namespace MuloApi.Interfaces
         Task<bool> IsCreatedDirectory(string directory, string userCatalog);
         Task<bool> UploadFile(string directory, Stream inputStream);
         Task<MemoryStream> GetFile(string directory);
+        Task<bool> DeleteFile(string directory);
     }
 }

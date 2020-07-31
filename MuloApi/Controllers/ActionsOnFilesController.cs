@@ -48,5 +48,23 @@ namespace MuloApi.Controllers
 
             return trackBinary;
         }
+
+        [HttpGet]
+        [Route("/user/{idUser:min(0)}/{idTrack:min(0)}/delete")]
+        public async Task<ActionResult> DeleteTrack(int idUser, int idTrack)
+        {
+            IActionDirectory userDirectory = new UserDirectory();
+            var idCatalog = -1;
+            var resultDeleting = await userDirectory.DeleteTrackUser(idUser, idCatalog, idTrack);
+
+            if (resultDeleting.Equals("error"))
+                return new JsonResult(new
+                    {
+                        error = "ERRORSERVER"
+                    })
+                    {StatusCode = 500};
+
+            return Ok();
+        }
     }
 }

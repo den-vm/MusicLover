@@ -170,5 +170,26 @@ namespace MuloApi.Classes
 
             return new List<ModelUserTracks>();
         }
+
+        public async Task<string> DeleteTrackUser(int idUser, int idCatalog, int idTrack)
+        {
+            try
+            {
+                var pathCatalog = await new ActionUserDataBase().Current.GetPathCatalog(idUser, idCatalog);
+                if (pathCatalog == null)
+                    throw new Exception("Error in executing the request to output the track list");
+                var fullPathTrack = $"{_defaultDirectoryUser}user_{idUser}{pathCatalog}{idTrack}.mp3";
+                var responseAws = await _directoryApp.DeleteFile(fullPathTrack);
+                var responseDataBase =
+                    await new ActionUserDataBase().Current.DeleteTrackUser(idUser, idCatalog, idTrack);
+                if(responseAws && responseDataBase)
+                    return "success";
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+            }
+            return "error";
+        }
     }
 }

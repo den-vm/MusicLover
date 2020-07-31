@@ -46,6 +46,20 @@ namespace MuloApi.Classes
             return newStreamFormFile;
         }
 
+        public async Task<bool> DeleteFile(string directory)
+        {
+            try
+            {
+                await _clientAws.DeleteObjectAsync(_bucketName, directory);
+                return true;
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+                return false;
+            }
+        }
+
         public async Task<bool> IsCreatedDirectory(string directory, string userCatalog)
         {
             try

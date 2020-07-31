@@ -185,8 +185,7 @@ namespace MuloApi.DataBase.Control
                             IdTrack = track.Id,
                             NameTrack = track.Name,
                             DateLoadTrack = DateTime.ParseExact(track.DateLoad, "O", CultureInfo.CurrentCulture)
-
-                })
+                        })
                         .ToList();
                     await DataBase.MusicTracks.AddRangeAsync(userTracks);
                     await DataBase.SaveChangesAsync();
@@ -236,7 +235,7 @@ namespace MuloApi.DataBase.Control
                 {
                     Id = track.IdTrack,
                     Name = track.NameTrack,
-                    DateLoad = track.DateLoadTrack.ToString("O") 
+                    DateLoad = track.DateLoadTrack.ToString("O")
                 }).ToArray();
 
                 return listTrack;
@@ -264,6 +263,28 @@ namespace MuloApi.DataBase.Control
             }
 
             return null;
+        }
+
+        public async Task<bool> DeleteTrackUser(int idUser, int idCatalog, int idTrack)
+        {
+            try
+            {
+                idCatalog = idCatalog == -1 ? 1 : idCatalog;
+                var dataMusicTrack = DataBase.
+                    MusicTracks.
+                    FirstOrDefault(track => track.IdUser.Equals(idUser) &&
+                                            track.IdCatalog.Equals(idCatalog) &&
+                                            track.IdTrack.Equals(idTrack));
+                // ReSharper disable once AssignNullToNotNullAttribute
+                DataBase.MusicTracks.Remove(dataMusicTrack);
+                await DataBase.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+                return false;
+            }
         }
     }
 }

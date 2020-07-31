@@ -20,5 +20,6 @@ namespace MuloApi.DataBase.Control.Interfaces
         Task AddTrackLoaded<T>(int idUser, string path, T tracks);
         Task<ModelUserTracks[]> GetTracksUser(int idUser, int idCatalog);
         Task<string> GetPathCatalog(int idUser, int idCatalog);
+        Task<bool> DeleteTrackUser(int idUser, int idCatalog, int idTrack);
     }
 }
