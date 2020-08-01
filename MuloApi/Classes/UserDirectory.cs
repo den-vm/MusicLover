@@ -182,14 +182,51 @@ namespace MuloApi.Classes
                 var responseAws = await _directoryApp.DeleteFile(fullPathTrack);
                 var responseDataBase =
                     await new ActionUserDataBase().Current.DeleteTrackUser(idUser, idCatalog, idTrack);
-                if(responseAws && responseDataBase)
+                if (responseAws && responseDataBase)
                     return "success";
             }
             catch (Exception e)
             {
                 LoggerApp.Log.LogException(e);
             }
+
             return "error";
+        }
+
+        public async Task<ModelUserTracks> ChangeDataTrack(int idUser, int idCatalog, int idTrack, string author,
+            string name)
+        {
+            try
+            {
+                var pathCatalog = await new ActionUserDataBase().Current.GetPathCatalog(idUser, idCatalog);
+                if (pathCatalog == null)
+                    throw new Exception("Error in executing the request to output the track list");
+                var fullPathTrack = $"{_defaultDirectoryUser}user_{idUser}{pathCatalog}{idTrack}.mp3";
+                var responseAws = await _directoryApp.GetFile(fullPathTrack);
+
+                var tempFile =
+                    new AudioFile(new DataAudioFile(fullPathTrack, responseAws));
+                var tagsAudioFile = MusicFile.Create(tempFile);
+                tagsAudioFile.Tag.Performers = author.Split();
+                tagsAudioFile.Tag.Title = name;
+                tagsAudioFile.Save();
+                var responseUpdateAws = await _directoryApp.UpdateFile(fullPathTrack, tempFile.ReadStream);
+                var responseDataBase =
+                    await new ActionUserDataBase().Current.ChangeTrackUser(idUser, idCatalog, idTrack, author, name);
+
+                if (responseUpdateAws && responseDataBase)
+                    return new ModelUserTracks
+                    {
+                        Id = idTrack,
+                        Name = author + " - " + name
+                    };
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+            }
+
+            return new ModelUserTracks();
         }
     }
 }

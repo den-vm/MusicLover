@@ -17,12 +17,7 @@ namespace MuloApi.Classes
         private static AmazonWebServiceS3 _instance;
         private readonly string _bucketName = "storage-app-musiclover";
 
-        private readonly IAmazonS3 _clientAws = new AmazonS3Client("AKIAJ5ASHTQ3JPIGMOKA",
-            "tkLM5m0sLLwCPyGTssOmfJfl94GikINyN0QDPIUA",
-            RegionEndpoint.EUNorth1);
-
         private readonly IAmazonS3 _clientAws;
-
         public AmazonWebServiceS3()
         {
             var settingsFile = File.ReadAllText(@"AWSConnect.json");
@@ -32,7 +27,6 @@ namespace MuloApi.Classes
                 awsSecretAccessKey,
                 RegionEndpoint.EUNorth1);
         }
-
         public static AmazonWebServiceS3 Current
         {
             get { return _instance ??= new AmazonWebServiceS3(); }
@@ -86,6 +80,26 @@ namespace MuloApi.Classes
             }
 
             return true;
+        }
+
+        public async Task<bool> UpdateFile(string directory, Stream fileStream)
+        {
+            try
+            {
+                var request = new PutObjectRequest
+                {
+                    InputStream = fileStream,
+                    BucketName = _bucketName,
+                    Key = directory
+                };
+                await _clientAws.PutObjectAsync(request);
+                return true;
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+                return false;
+            }
         }
 
         public async Task<bool> UploadFile(string directory, Stream inputStream)

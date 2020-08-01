@@ -286,5 +286,29 @@ namespace MuloApi.DataBase.Control
                 return false;
             }
         }
+
+        public async Task<bool> ChangeTrackUser(int idUser, int idCatalog, int idTrack, string author, string name)
+        {
+            try
+            {
+                idCatalog = idCatalog == -1 ? 1 : idCatalog;
+                var dataMusicTrack = DataBase.
+                    MusicTracks.
+                    FirstOrDefault(track => track.IdUser.Equals(idUser) &&
+                                            track.IdCatalog.Equals(idCatalog) &&
+                                            track.IdTrack.Equals(idTrack));
+                // ReSharper disable once PossibleNullReferenceException
+                dataMusicTrack.NameTrack = author + " - " + name;
+                // ReSharper disable once AssignNullToNotNullAttribute
+                DataBase.MusicTracks.Update(dataMusicTrack);
+                await DataBase.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                LoggerApp.Log.LogException(e);
+                return false;
+            }
+        }
     }
 }

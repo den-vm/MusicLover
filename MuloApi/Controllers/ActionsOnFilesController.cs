@@ -66,5 +66,26 @@ namespace MuloApi.Controllers
 
             return Ok();
         }
+        
+        [HttpGet]
+        [Route("/user/{idUser:min(0)}/{idTrack:min(0)}/change/{author:required}&{name:required}")]
+        public async Task<ActionResult> ChangeTrack(int idUser, int idTrack, string author, string name)
+        {
+            IActionDirectory userDirectory = new UserDirectory();
+            var idCatalog = -1;
+            var resultChange = await userDirectory.ChangeDataTrack(idUser, idCatalog, idTrack, author, name);
+
+            if (resultChange == null)
+                return new JsonResult(new
+                    {
+                        error = "ERRORSERVER"
+                    })
+                    { StatusCode = 500 };
+
+            return new JsonResult(new
+            {
+                track = resultChange
+            });
+        }
     }
 }

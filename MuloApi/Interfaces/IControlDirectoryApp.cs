@@ -14,5 +14,6 @@ namespace MuloApi.Interfaces
         Task<bool> UploadFile(string directory, Stream inputStream);
         Task<MemoryStream> GetFile(string directory);
         Task<bool> DeleteFile(string directory);
+        Task<bool> UpdateFile(string directory, Stream fileStream);
     }
 }
