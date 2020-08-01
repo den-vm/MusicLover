@@ -15,7 +15,7 @@ namespace MuloApi.Classes
     internal class AmazonWebServiceS3 : IControlDirectoryApp, IControlSaveLogs
     {
         private static AmazonWebServiceS3 _instance;
-        private readonly string _bucketName = "storage-app-musiclover";
+        private readonly string _bucketName = "musiclover";
 
         private readonly IAmazonS3 _clientAws;
         public AmazonWebServiceS3()
