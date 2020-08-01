@@ -1,5 +1,0 @@
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=ec2-176-34-123-50.eu-west-1.compute.amazonaws.com;Port=5432;Database=dcsgtos445b0in;Username=xosnxsfkoyntxk;Password=7302b52dd8a715f12cab583f1330d110585a826df057e0d5162af8f85f74915f;SSL Mode=Require;Trust Server Certificate=true"
-  }
-}
