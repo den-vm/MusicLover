@@ -133,8 +133,7 @@ namespace MuloApi.Classes
             {
                 InputStream = new MemoryStream(bytes),
                 Key = "LogsApp/" + filename,
-                BucketName = _bucketName,
-                CannedACL = S3CannedACL.PublicRead
+                BucketName = _bucketName
             };
 
             var fileTransferUtility = new TransferUtility(_clientAws);
