@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using MuloApi.Classes;
 using MuloApi.DataBase.Control;
 using MuloApi.DataBase.Control.Interfaces;
@@ -32,22 +33,22 @@ namespace MuloApi.Controllers
             });
         }
 
-        [HttpGet]
-        [Route("/user/{idUser:min(0)}/soundtracks/{idTrack:min(0)}.mp3")]
-        public async Task<ActionResult> PlaySoundTrack(int idUser, int idTrack)
-        {
-            IActionDirectory userDirectory = new UserDirectory();
-            var idCatalog = -1;
-            var trackBinary = await userDirectory.GetActiveTrackUser(idUser, idCatalog, idTrack);
-            if (trackBinary == null)
-                return new JsonResult(new
-                    {
-                        error = "ERRORSERVER"
-                    })
-                    {StatusCode = 500};
+        //[HttpGet]
+        //[Route("/user/{idUser:min(0)}/soundtracks/{idTrack:min(0)}.mp3")]
+        //public async Task<ActionResult> PlaySoundTrack(int idUser, int idTrack)
+        //{
+        //    IActionDirectory userDirectory = new UserDirectory();
+        //    var idCatalog = -1;
+        //    var trackBinary = await userDirectory.GetActiveTrackUser(idUser, idCatalog, idTrack);
+        //    if (trackBinary == null)
+        //        return new JsonResult(new
+        //            {
+        //                error = "ERRORSERVER"
+        //            })
+        //            {StatusCode = 500};
 
-            return trackBinary;
-        }
+        //    return trackBinary;
+        //}
 
         [HttpGet]
         [Route("/user/{idUser:min(0)}/{idTrack:min(0)}/delete")]
