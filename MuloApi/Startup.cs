@@ -1,17 +1,15 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http.Connections;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.WebSockets;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MuloApi.Classes;
-using MuloApi.Controllers;
 using MuloApi.DataBase;
 using MuloApi.DataBase.Control;
 using MuloApi.Filters;
@@ -42,18 +40,58 @@ namespace MuloApi
                     options.AddPolicy("herokuapp",
                         builder => builder
                             .SetIsOriginAllowedToAllowWildcardSubdomains()
-                            .WithOrigins("https://*.herokuapp.com", "https://localhost:1441", "https://localhost:5001", "https://localhost")
+                            .WithOrigins("https://*.herokuapp.com", "https://localhost:1441", "https://localhost:5001",
+                                "https://localhost")
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials()
                     );
                 });
+                services.AddAuthentication(options =>
+                    {
+                        // Identity made Cookie authentication the default.
+                        // However, we want JWT Bearer Auth to be the default.
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    })
+                    .AddJwtBearer(options =>
+                    {
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnMessageReceived = async context =>
+                            {
+                                var request = context.HttpContext.Request;
+                                if (!request.Path.StartsWithSegments("/user/negotiate"))
+                                {
+                                    await Task.CompletedTask;
+                                    return;
+                                }
+
+                                // If the request is for our hub...
+                                var controlDataBase = new ActionUserDataBase().Current;
+                                var dataCookie = await controlDataBase.GetDataCookieUser(request.Cookies["session"]);
+                                if (dataCookie == null)
+                                {
+                                    var responceJson = new JsonResult(new
+                                    {
+                                        error = "ERRORSERVER"
+                                    })
+                                    { StatusCode = 500 };
+                                    context.Response.StatusCode = 500;
+                                    context.NoResult();
+                                    return;
+                                }
+                            }
+                        };
+                    });
                 services.AddSignalR(hubOptions =>
                 {
                     hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(30); //Время ожидания сообщения от клиента
                     hubOptions.HandshakeTimeout =
                         TimeSpan.FromSeconds(5); //Время ожидания первого сообщения от клиента
-                    hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10); //Ожидание ответа от сервера, в случае простоя направить ping для поддержания открытого состояния
+                    hubOptions.KeepAliveInterval =
+                        TimeSpan.FromSeconds(
+                            10); //Ожидание ответа от сервера, в случае простоя направить ping для поддержания открытого состояния
                 });
             }
             catch (Exception e)
@@ -76,7 +114,7 @@ namespace MuloApi
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
                 app.UseCors("herokuapp");
                 app.UseRouting();
-                
+                app.UseAuthentication();
                 app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
