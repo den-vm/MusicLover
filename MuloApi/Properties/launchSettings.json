@@ -22,7 +22,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "sqlDebugging": false,
-      "nativeDebugging": false,
+      "nativeDebugging": true,
       "applicationUrl": "https://localhost:1441"
     },
     "Docker": {
