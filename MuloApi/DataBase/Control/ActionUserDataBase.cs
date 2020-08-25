@@ -173,7 +173,7 @@ namespace MuloApi.DataBase.Control
         {
             try
             {
-                if (tracks is List<ModelUserTracks> listTracks)
+                if (tracks is List<ModelDataUserTracks> listTracks)
                 {
                     var catalog =
                         await DataBase.Catalogs.FirstOrDefaultAsync(e =>
@@ -184,7 +184,10 @@ namespace MuloApi.DataBase.Control
                             IdCatalog = catalog.Id,
                             IdTrack = track.Id,
                             NameTrack = track.Name,
-                            DateLoadTrack = DateTime.ParseExact(track.DateLoad, "O", CultureInfo.CurrentCulture)
+                            DateLoadTrack = DateTime.ParseExact(track.DateLoad, "O", CultureInfo.CurrentCulture),
+                            Size = track.Size,
+                            PlayTime = track.TimeTrack,
+                            StopPlayTime = track.StopPlayTime
                         })
                         .ToList();
                     await DataBase.MusicTracks.AddRangeAsync(userTracks);
@@ -218,7 +221,7 @@ namespace MuloApi.DataBase.Control
             return "";
         }
 
-        public async Task<ModelUserTracks[]> GetTracksUser(int idUser, int idCatalog)
+        public async Task<ModelDataUserTracks[]> GetTracksUser(int idUser, int idCatalog)
         {
             try
             {
@@ -231,11 +234,14 @@ namespace MuloApi.DataBase.Control
                     return DataBase.MusicTracks.Where(track =>
                         track.IdUser.Equals(idUser) && track.IdCatalog.Equals(idCatalog)).ToList();
                 });
-                var listTrack = result.Select(track => new ModelUserTracks
+                var listTrack = result.Select(track => new ModelDataUserTracks
                 {
                     Id = track.IdTrack,
                     Name = track.NameTrack,
-                    DateLoad = track.DateLoadTrack.ToString("O")
+                    DateLoad = track.DateLoadTrack.ToString("O"),
+                    Size = track.Size,
+                    TimeTrack = track.PlayTime,
+                    StopPlayTime = track.StopPlayTime
                 }).ToArray();
 
                 return listTrack;

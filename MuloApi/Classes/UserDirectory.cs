@@ -37,7 +37,7 @@ namespace MuloApi.Classes
         }
 
 
-        public async Task<ModelUserTracks[]> GetTracksUser(int idUser, int idCatalog)
+        public async Task<ModelDataUserTracks[]> GetTracksUser(int idUser, int idCatalog)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace MuloApi.Classes
             }
         }
 
-        public async Task<List<ModelUserTracks>> SavedTracksUser(int idUser, int idCatalog,
+        public async Task<List<ModelDataUserTracks>> SavedTracksUser(int idUser, int idCatalog,
             IFormFileCollection tracksCollection)
         {
             try
@@ -96,7 +96,7 @@ namespace MuloApi.Classes
 
                 var newIdTrack = tracksUser.Length > 0 ? tracksUser.Select(track => track.Id).Max() + 1 : 1;
 
-                var uploadTrackList = new List<ModelUserTracks>();
+                var uploadTrackList = new List<ModelDataUserTracks>();
 
                 foreach (var track in tracksCollection)
                 {
@@ -143,11 +143,14 @@ namespace MuloApi.Classes
                     var nameTrack =
                         string.Concat(tagsAudioFile.Tag.JoinedPerformers, " - ", tagsAudioFile.Tag.Title);
 
-                    uploadTrackList.Add(new ModelUserTracks
+                    uploadTrackList.Add(new ModelDataUserTracks
                     {
                         Id = newIdTrack,
                         Name = nameTrack,
-                        DateLoad = DateTime.Now.ToString("O") // datetime format ISO 8601
+                        DateLoad = DateTime.Now.ToString("O"), // datetime format ISO 8601
+                        Size = (int)tagsAudioFile.Length,
+                        TimeTrack = tagsAudioFile.Properties.Duration.ToString(),
+                        StopPlayTime = ""
                     });
 
                     await _directoryApp.UploadFile(
@@ -168,7 +171,7 @@ namespace MuloApi.Classes
                 LoggerApp.Log.LogException(e);
             }
 
-            return new List<ModelUserTracks>();
+            return new List<ModelDataUserTracks>();
         }
 
         public async Task<string> DeleteTrackUser(int idUser, int idCatalog, int idTrack)

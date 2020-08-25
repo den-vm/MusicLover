@@ -13,5 +13,8 @@ namespace MuloApi.DataBase.Entities
         [Required] public string NameTrack { get; set; }
 
         [Required] public DateTime DateLoadTrack { get; set; }
+        [Required] public int Size { get; set; }
+        [Required] public string PlayTime { get; set; }
+        [Required] public string StopPlayTime { get; set; }
     }
 }

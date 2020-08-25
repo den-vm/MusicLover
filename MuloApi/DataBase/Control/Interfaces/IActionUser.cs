@@ -18,7 +18,7 @@ namespace MuloApi.DataBase.Control.Interfaces
         Task<bool> DeleteCookieUser(string cookie);
         Task<bool> CreateCatalog(int idUser, string path);
         Task AddTrackLoaded<T>(int idUser, string path, T tracks);
-        Task<ModelUserTracks[]> GetTracksUser(int idUser, int idCatalog);
+        Task<ModelDataUserTracks[]> GetTracksUser(int idUser, int idCatalog);
         Task<string> GetPathCatalog(int idUser, int idCatalog);
         Task<bool> DeleteTrackUser(int idUser, int idCatalog, int idTrack);
         Task<bool> ChangeTrackUser(int idUser, int idCatalog, int idTrack, string author, string name);
