@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using MuloApi.Classes;
 using MuloApi.Interfaces;
+using Newtonsoft.Json;
 
 namespace MuloApi.Hubs
 {
@@ -22,14 +23,32 @@ namespace MuloApi.Hubs
 
             if (trackStream.Length == 0)
             {
-                await Clients.Caller.ErrorResponce("ErrorResponce", "ERRORSERVER");
+                var errorMessage = JsonConvert.SerializeObject(new
+                {
+                    errors = new[]
+                    {
+                        new
+                        {
+                            message = "Track not found",
+                            name = "ERROR_SERVER"
+                        }
+                    }
+                });
+                await Clients.Caller.Error(errorMessage);
                 return;
             }
 
-            var fileResultPart = new FileContentResult(trackStream.ToArray(), "audio/mpeg");
-            trackStream.Close();
+            for (var i = 0; i < trackStream.ToArray().Length; i += 6000)
+            {
+                var trackByte = trackStream.ToArray().Skip(i).Take(6000);
+                await Clients.Caller.PartMusicTrack(trackByte.ToArray());
+            }
 
-            await Clients.Caller.GetMusicTrack("MusicTrack", fileResultPart);
+            var message = JsonConvert.SerializeObject(new
+            {
+                message = "Complete"
+            });
+            await Clients.Caller.Message(message);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +7,8 @@ namespace MuloApi
 {
     public interface IClientHub
     {
-        Task GetMusicTrack(string method, IActionResult result);
-        Task ErrorResponce(string method, string error);
+        Task PartMusicTrack(byte[] byteTrack);
+        Task Message(string message);
+        Task Error(string error);
     }
 }
